@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>Terminarz</title>
+<link rel="stylesheet" type="text/css" href="/pogodynka.css">
+<script type="application/javascript" src="/pogodynka.js"></script>
+</head>
+<body>
+<div id="maincontainer">
+<h1>Terminarz</h1>
+
+<div id="linkcontainer" class="kx kxdouble">
+<a href="/" class="skip s1" >Wróć do ustawień</a>
+<a href="/calendar.html" class="skip s2">Kalendarz</a>
+</div>
+
+<div class="settingdiv">
+<div class="kx1 kx"><h2>Wszystkie wpisy</h2></div>
+<div id="evdiv" role="grid" aria-role="grid"></div>
+<div class="kx1 kx"><h2>Nowy wpis</h2></div>
+<div role="form" aria-role="form">
+<div class="kx2a kx">
+    <label for="newevtday">Dzień<span class="aural"> nowego wpisu</span></label>
+    <span><input type="number" min="1" max="31" step="1" id="newevtday" value=""></span>
+</div>
+
+<div class="kx2a kx">
+    <label for="newevtmon">Miesiąc<span class="aural"> nowego wpisu</span></label>
+    <span><select id="newevtmon">
+        <option>Styczeń</option>
+        <option>Luty</option>
+        <option>Marzec</option>
+        <option>Kwiecień</option>
+        <option>Maj</option>
+        <option>Czerwiec</option>
+        <option>Lipiec</option>
+        <option>Sierpień</option>
+        <option>Wrzesień</option>
+        <option>Październik</option>
+        <option>Listopad</option>
+        <option>Grudzień</option></select></span></div>
+    </select>
+<div class="kx2a kx">
+    <label for="newevtyer">Rok<span class="aural"> nowego wpisu</span></label>
+    <span><select id="newevtyer" class="yearspec"></select></span></div>
+    
+<div class="kx2a kx">
+    <label for="newevttxt">Treść<span class="aural"> nowego wpisu</span></label>
+    <span><input type="text" size="16"id="newevttxt" value=""></span>
+</div>
+
+<div class="kx1 kx buttonlist">
+    <button onclick="addEvtItem();" title="Nowy wpis z danych powyżej">Dodaj wpis</button>
+    <button onclick="saveTimetab();" title="Zapisanie na stałe">Zapamiętaj</button>
+    <button onclick="revertTimetab();" title="Powrót do zaisanych wartości">Przywróć</button>
+</div>
+</div>
+
+</div>
+
+</div>
+<script type="text/javascript">
+    initEvt();
+</script>
+<span class="aural" role="alert" aria-role="alert" id="arialert"></span>
+<dialog id="alergia">
+    <form method="dialog">
+    <p><button id="alergen" tabindex="0" autofocus>...</button></p>
+        <button>OK</button>
+    </form>
+</dialog>
+
+
+</body>
+</html>

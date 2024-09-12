@@ -1,0 +1,241 @@
+html, body {
+    font-size:12px;
+    color: black;
+    font-family: verdana, sand-serif;
+    }
+#maincontainer {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 5px;
+    background-color: #eeeeee;
+    color: black;
+    }
+.datatable td.tdbuttons{
+    text-align:center;
+    }
+.datatable tbody th {
+    text-align: right;
+    vertical-align: top;
+    }
+.datatable {
+    border-spacing: 0;
+    border-collapse: collapse;
+    }
+.datatable th, .datatable td {
+    padding: 5px 20px;
+    border: solid black 1px;
+    }
+.aural {
+    display:block;
+    position: absolute;
+    left: -2000px;
+    }
+    
+div.settingdiv {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    }
+
+div.settingdiv>div {
+    text-indent: 0;
+    margin: 0;
+    padding: 0;
+    
+}
+
+    
+
+
+.kx>label {
+    display:inline-block;
+    padding: 5px;
+    text-align:right;
+    font-weight: bold;
+}
+
+.kx2>label {
+    width:40%;
+}
+
+.kx2a>label {
+    width:40%;
+}
+.kx2b>label {
+    width:20%;
+ }
+
+.kx2c>label {
+    width:50%;
+ }
+
+.kx2d>label {
+    width:80%;
+ }
+
+.kx>span {
+    display: inline-block;
+    padding: 5px;
+    }
+
+.kx:nth-child(even) {
+    background-color: #aaaaff;
+    }
+
+
+.kx:nth-child(odd) {
+    background-color: #9999ff;
+    }
+
+.kx:hover {
+    background-color: red;
+    }
+
+.kx {
+    display: block;
+    width:100%;
+}
+
+.kxh {
+    padding: 15px 0 !important;
+    font-weight: bold;
+    text-align:center;
+    font-size: 1.5em;
+    color: yellow;
+    }
+.buttonlist {
+    text-align: center;
+    }
+
+.buttonlist button {
+    width: 20%;
+    padding: 2px 0px;
+    margin: 5px 5px;
+    background-color: #7777ff;
+    border-radius: 6px;
+    border-color: black;
+    border-style: solid;
+    color: white;
+    font-weight: bold;
+    font-family: verdana, sans-serif;
+    }
+.buttonlist button:hover, .buttonlist button:focus {
+    background-color: #ccccff;
+    color: black;
+    }
+
+h1 {
+    font-size: 3em;
+    margin: 0;
+    text-align: center;
+    padding: 10px 0;
+    color: yellow;
+    background-color: #8888ff;
+    }
+
+.kx h2 {
+    font-size: 2em;
+    margin: 0;
+    text-align: center;
+    padding: 10px 0;
+    color: yellow;
+    background-color: #8888ff;
+}
+
+.kxca span.spninfo {
+    display: inline-block;
+    width: 80%;
+    text-align: right;
+    font-weight: bold;
+    }
+
+a.skip {
+    display: block;
+    margin: 5px 0;
+    padding: 5px;
+    font-size: 1.5em;
+    color: yellow;
+    background-color: #8888ff;
+    font-weight: bold;
+    text-decoration: none;
+    text-align: center;
+    }
+
+#linkcontainer {
+    background-color: #8888ff;
+}
+
+#linkcontainer::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+.kxdouble a.s1 {
+    width:40%;
+    float:left;
+}
+
+.kxdouble a.s2 {
+    width:40%;
+    float:right;
+}
+
+.kxsingle a.s2 {
+    display: none;
+    }
+a.skip:hover, a.skip:focus {
+    background-color: red;
+    }
+
+#alergen {
+    border: none;
+    background-color: transparent;
+}
+
+#alergen:focus {
+    text-decoration: none;
+    background-color: #eeeeee;
+    }
+
+.invisible {
+    display:none;
+    }
+
+#citylist {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+#citylist li {
+    list-style:none;
+    text-indent: 0;
+    margin: 0;
+    padding: 0;
+    }
+
+#citylist a {
+    display: block;
+    text-decoration: none;
+    padding: 2px 5px;
+    color: black;
+    
+    }
+
+#citylist li:nth-child(even) a {
+    background-color: #ccccff;
+    }
+
+
+#citylist li:nth-child(odd) a {
+    background-color: #bbbbff;
+    }
+
+#citylist li a:hover, #citylist li a:focus {
+    background-color: yellow !important;
+    color: black;
+    }
+#firmware {
+    margin-top: 10px;
+    text-align: center;
+    }

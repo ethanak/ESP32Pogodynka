@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>Pogodynka</title>
+<link rel="stylesheet" type="text/css" href="/pogodynka.css">
+<script type="application/javascript" src="/pogodynka.js"></script>
+</head>
+<body>
+<div id="maincontainer">
+<h1>Pogodynka</h1>
+<div id="linkcontainer" class="kx kxsingle">
+<a href="/calendar.html" class="skip s1" >Kalendarz</a>
+<a href="/events.html" class="skip s2">Terminarz</a>
+</div>
+
+<h2>Ustawienia mowy</h2>
+
+<div class="settingdiv">
+<div class="kx2 kx">
+    <label for="spktempo">Tempo<span class="aural"> mowy</span></label>
+    <span><input id="spktempo" size="4" type="number" min="0" max="24" step="1"></span></div>
+<div class="kx2 kx">
+    <label for="spkpitch">Wysokość</label>
+    <span><input id="spkpitch" size="4" type="number" min="0" max="24" step="1"></span></div>
+<div class="kx2 kx">
+    <label for="spkvol">Głośność</label>
+    <span><input id="spkvol" size="4" type="number" min="0" max="24" step="1"></span></div>
+<div class="kx2 kx">
+    <label for="spkcon">Wyrazistość</label>
+    <span><input id="spkcon" size="4" type="number" min="0" max="24" step="1"></span></div>
+<div class="kx1 kx buttonlist">
+    <button title="zapisanie do pamięci ram" onclick="setGadacz();">Ustaw<span class="aural"> mowę</span></button>
+    <button onclick="speakDemo();" title="Powiedz tekst demonstacyjny">Testuj<span class="aural"> mowę</span></button>
+    <button onclick="saveData('spk');" title="Zapisanie na stałe">Zapamiętaj<span class="aural"> mowę</span></button>
+    <button onclick="revertData('spk');" title="Powrót do zaisanych wartości">Przywróć<span class="aural"> mowę</span></button>
+</div>
+</div>
+
+<h2>Odczyty i prognoza</h2>
+
+<div class="settingdiv">
+<div class="kx2c kx">
+    <label for="weaspkinname">Nazwa wewnątrz</label>
+    <span><input type="text" id="weaspkinname" size="14"></span></div>
+
+<div class="kx2c kx">
+    <label for="weaspkexname">Nazwa na zewnątrz</label>
+    <span><input type="text" id="weaspkexname" size="14"></span></div>
+
+
+<div class="kx2c kx">
+<label for="weaspkpre">Prawdopodobieństwo opadów</label>
+<span><input type="number" id="weaspkpre" size="4" min="10" max="60" stap="5"
+        title="Minimalne prawdopodobieństwo opadów do określania prognozy dziennej"></span></div>
+
+<div class="kx2c kx">
+<label for="weaspkspl">Godzina przełączania prognozy</label>
+<span><input type="number" id="weaspkspl" size="4" min="12" max="16" stap="1"
+        title=title="przełączanie trybu prognozy z dziś/jutro na jutro/pojutrze, od 12 do 16"></span></div>
+<div class="kx kxh">Odczytuj</div>
+<div class="kx2c kx">
+<label for="weaspkpres"><span class="aural">odczytuj </span>Ciśnienie</label>
+<span><input type="checkbox" value="1" id="weaspkpres"></span></div>
+
+<div class="kx2c kx">
+<label for="weaspkhgrin"><span class="aural">odczytuj </span>Wilgotność wewnątrz</label>
+<span><input type="checkbox" value="4" id="weaspkhgrin"></span></div>
+
+<div class="kx2c kx">
+<label for="weaspkhgrout"><span class="aural">odczytuj </span>Wilgotność na zewnątrz</label>
+<span><input type="checkbox" value="8" id="weaspkhgrout"></span></div>
+
+<div class="kx2c kx">
+<label for="weaspkrepres">Przeliczaj ciśnienie na p.m.</label>
+<span><input type="checkbox" value="2" id="weaspkrepres"></span></div>
+
+<div class="kx2c kx">
+<label for="weaspkcrmo">Odczyt bieżących warunków</label>
+<span><select id="weaspkcrmo">
+    <option value="0">Brak</option>
+    <option value="1" title="tylko temperatura">Krótki</option>
+    <option value="2">Pełny</option>
+</select></span></div>
+
+
+<div class="kx2c kx">
+<label for="weaspkhly"><span class="aural">odczytuj </span>Święta państwowe</label>
+<span><input type="checkbox" value="16" id="weaspkhly"></span></div>
+
+<div class="kx2c kx">
+<label for="weaspkchu"><span class="aural">odczytuj </span>Również święta kościelne</label>
+<span><input type="checkbox" value="32" id="weaspkchu"></span></div>
+<div class="kx2c kx">
+<label for="weaspktom"><span class="aural">odczytuj </span>Wydarzenia na jutro</label>
+<span><input type="checkbox" value="64" id="weaspktom"></span></div>
+<div class="kx2c kx">
+<label for="weaspkhall">Zawsze odczytuj wydarzenia</label>
+<span><input type="checkbox" value="128" id="weaspkhall"></span></div>
+
+<div class="kx1 kx buttonlist">
+<button onclick="setWeastyle();" title="Zapisanie do pamięci RAM">Ustaw<span class="aural">czytanie prognozy</span></button>
+<button onclick="saveData('wea');" title="Zapisanie na stałe">Zapamiętaj<span class="aural">czytanie prognozy</span></button>
+<button onclick="revertData('wea');" title="Powrót do zaisanych wartości">Przywróć<span class="aural">czytanie prognozy</span></button>
+</div>
+
+</div>
+
+<h2>Położenie geograficzne</h2>
+
+<div class="settingdiv">
+<div id="citysel" class="kx2a kx invisible">
+<label for="cityfdr">Kod pocztowy lub nazwa</label>
+<span><input id="cityfdr" size="12" type="text">
+<input type="button" value="Szukaj" onclick="citysearch()"></span>
+</div>
+<div class="kx2a kx">
+    <label for="geolon">Długość geograficzna</label>
+    <span><input id="geolon" size="12" type="text"></span></div>
+<div class="kx2a kx">
+    <label for="geolat">Szerokość geograficzna</label>
+    <span><input id="geolat" size="12" type="text"></span></div>
+<div class="kx2a kx">
+    <label for="geoelev">Wysokość n.p.m.</label>
+    <span><input id="geoelev" size="4" type="number" step="10" min="-400" max="3000">
+        <label><input type="checkbox" id="autoelev" onclick="autoElev();">Auto</label>
+        </span></div>
+<div class="kx2a kx">
+    <label for="geoautz">Strefa czasowa prognozy</label>
+    <span><select id="geoautz">
+        <option value="0">Polska</option>
+        <option value="1">auto</option>
+    </select></span></div>
+
+<div class="kx1 kx buttonlist">
+<button id="setgeoloc" onclick="setGeoloc();" title="Zapisanie do pamięci RAM">Ustaw<span class="aural">położenie</span></button>
+<button onclick="saveData('geo');" title="Zapisanie na stałe">Zapamiętaj<span class="aural">położenie</span></button>
+<button onclick="revertData('geo');" title="Powrót do zaisanych wartości">Przywróć<span class="aural">położenie</span></button>
+            </div>
+
+</div>
+
+<h2>Strefa czasowa</h2>
+<div class="settingdiv">
+<div class="kx2b kx">
+    <label for="clkoffset">Offset</label>
+    <span><input id="clkoffset" size="6" type="number" step="30" min="-60" max="240"
+                title="Różnica między czasem lokalnym a uniwersalnym w minutach">
+            <label><input type="checkbox" id="clkdst">Zmiana czasu</label>
+            <input type="button" value="Auto" onclick="autoTZ()" title="Ustaw wartości automatycznie">
+            <input type="button" value="Sync" onclick="syncClock()" title="Synchronizuj czas z interneterm">
+            </span></div>
+
+<div class="kx1 kx buttonlist">
+<button onclick="setTimezone();" title="Zapisanie do pamięci RAM">Ustaw<span class="aural">strefę czasową</span></button>
+<button onclick="saveData('tz');" title="Zapisanie na stałe">Zapamiętaj<span class="aural">strefę czasową</span></button>
+<button onclick="revertData('tz');" title="Powrót do zapisanych wartości">Przywróć<span class="aural">strefę czasową</span></button>
+</div>
+
+</div>
+
+<div id="firmware">Wersja oprogramowania: <span id="firmversion"></span>
+<span id="chkversion" class="aural"><input type="button" value="Sprawdź dostępność aktualizacji" onclick="checkupdate()"></span></div>
+</div>
+<span class="aural" role="alert" aria-role="alert" id="arialert"></span>
+<dialog id="alergia">
+    <form method="dialog">
+    <p><button id="alergen" tabindex="0" autofocus>...</button></p>
+        <button>OK</button>
+    </form>
+</dialog>
+
+<dialog id="miastodont" autofocus>
+<p id="cityheader"></p>
+    
+<form method="dialog">
+    <ul id="citylist"></ul>
+    <input type="button" value="Cancel" onclick="closeMiast()">
+</form>
+</dialog>
+</body>
+<script type="application/javascript">
+initMe();
+</script>
+</html>

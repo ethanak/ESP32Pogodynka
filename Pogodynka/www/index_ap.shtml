@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>Pogodynka</title>
+<link rel="stylesheet" type="text/css" href="/pogodynka.css">
+<script type="application/javascript" src="/pogodynka.js"></script>
+</head>
+<body>
+<div id="maincontainer">
+<h1>Pogodynka</h1>
+
+<div class="settingdiv">
+<div class="kx2a kx">
+    <label for="ssidsel">Wybierz sieć</label>
+    <span><select id="ssidsel"><option value="">Wpisz ręcznie</option></select></span></div>
+<div class="kx2a kx">
+    <label for="ssid">Nazwa sieci</label>
+    <span><input type="text" id="ssid" size="16"></span></div>
+
+<div class="kx2a kx">
+    <label for="passwd">Hasło</label>
+    <span><input type="text" id="passwd" size="16"></span></div>
+<div class="kx2a kx">
+    <label for="dhcp">Ustawienia</label>
+    <span><select id="dhcp" onchange="ShowHideDHCP();"><option value="0">Ręcznie</option><option value="1">Automatycznie</option></select></span></div>
+
+<div id="hidiv">
+<div class="kx2a kx kxhide">
+    <label for="ipadr">Adres IP</label>
+    <span><input type="text" id="ipadr" size="16"></span></div>
+<div class="kx2a kx kxhide">
+    <label for="ipmask">Maska podsieci</label>
+    <span><input type="text" id="ipmask" size="16"></span></div>
+<div class="kx2a kx kxhide">
+    <label for="ipgw">Adres bramy</label>
+    <span><input type="text" id="ipgw" size="16"></span></div>
+
+<div class="kx2a kx kxhide">
+    <label for="ipns1">Pierwszy serwer nazw</label>
+    <span><input type="text" id="ipns1" size="16"></span></div>
+
+
+<div class="kx2a kx kxhide">
+    <label for="ipns2">Drugi serwer nazw</label>
+    <span><input type="text" id="ipns2" size="16"></span></div>
+
+</div>
+</div> <!-- hidiv -->
+<div class="kx2a kx">
+    <label for="mdns">Nazwa lokalna</label>
+    <span><input type="text" id="mdns" size="16"></span></div>
+
+</div>
+
+<div class="kx1 kx buttonlist">
+<button onclick="storeWiFi();" title="Zapisuje ustawienia i resetuje urządzenie">Zapisz<span class="aural">ustawienia WiFi</span></button>
+</div>
+
+
+</div>
+
+
+</div>
+<script type="application/javascript">
+initAp();
+</script>
+</html>
+</body>
+
