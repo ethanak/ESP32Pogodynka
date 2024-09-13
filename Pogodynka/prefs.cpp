@@ -1161,14 +1161,21 @@ static const char *const shpins[]={
 
 #ifdef  CONFIG_IDF_TARGET_ESP32S3
 static const uint8_t zeropins[]={1,0,0,0,0,0,1,1,0,1};
+#ifdef S3_ALLOW_ALL_PINS
+static uint8_t alPins[]={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,
+    43,44,45,46,47,48,0};
+#else
 static uint8_t alPins[]={1,2,3,4,5,6,7,8,9,10,43,44,0};
+#endif
 uint8_t pfsPinny(Print &Ser, char *par)
 {
     int i,j,npin,vpin;uint8_t *pins=(uint8_t *)&pinPrefs;
     const char *tok;
     if (!par || !*par) {
         for (i=0;i<10;i++) if (pins[i]) {
-            Ser.printf("Pin %-4s: %d (%s)\n",shpins[i],pins[i],lopins[i]);
+            Ser.printf("Pin %-4s: %2d%c (%s)\n",shpins[i],pins[i],
+                (pins[i] > 44 || (pins[i] >10 && pins[i]<20)) ? '*':' ',
+            lopins[i]);
         }
         else {
             Ser.printf("Pin %-4s: nieaktywny (%s)\n",shpins[i],lopins[i]);
@@ -1229,7 +1236,7 @@ uint8_t pfsPinny(Print &Ser, char *par)
                 return 0;
             }
             for (i=0;alPins[i];i++) if (vpin == alPins[i]) break;
-            if (!alPins[i] || (npin == 0 && vpin > 10)) {
+            if (!alPins[i] || (npin == 0 && vpin > 18)) {
                 Ser.printf("Nielegalny numer GPIO\n");
                 return 0;
             }
@@ -1239,7 +1246,9 @@ uint8_t pfsPinny(Print &Ser, char *par)
     if (!pins[npin])
         Ser.printf("Pin %-4s: nieaktywny (%s)\n",shpins[npin],lopins[npin]);
     else
-        Ser.printf("Pin %-4s: %d (%s)\n",shpins[npin],pins[npin],lopins[npin]);
+        Ser.printf("Pin %-4s: %2d%c (%s)\n",shpins[npin],pins[npin],
+        (pins[npin] > 44 || (pins[npin] >10 && pins[npin]<20)) ? '*':' ',
+        lopins[npin]);
     return 0;
 }
 #else

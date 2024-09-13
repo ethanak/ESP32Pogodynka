@@ -1,9 +1,11 @@
 #ifndef POGODA_H
 #define POGODA_H
 
-#define firmware_version "0.2.2"
+#define firmware_version "0.2.3"
 
 #define UNIT_USE_EVENTS 1
+#define S3_ALLOW_ALL_PINS 1
+
 // WiFi
 extern void initWiFi();
 
