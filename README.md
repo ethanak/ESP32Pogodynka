@@ -29,6 +29,9 @@ Na razie instrukcja jest niekompletna, proszę o cierpliwość!
 * Dla instalacji na XIAO ESP32S3 i podobnych (min. 8 MB Flash, min. 2MB PSRAM)
   * [polski głos pl1_alaw](https://github.com/ethanak/mimbrola_voices_pl) - żeby mogła mówić
 
+Ponieważ standardowo w Arduino IDE nie zawiera układu partycji koniecznego
+do skompilowania programu, należy przygotować je zgodnie z [instrukcją](partitions).
+
 To nie wszystko... pracuję nad dokumentacją
 
 
