@@ -82,9 +82,9 @@ enum {
 #define DOUT_PIN pinPrefsW.dout
 
 #else
+#define PIN_DHT 17
+#define PIN_ONEWIRE 16
 #define PIN_BUTTON 27
-#define PIN_DHT 23
-#define PIN_ONEWIRE 19
 #define PIN_SDA SDA
 #define PIN_SCL SCL
 #define PIN_IR_RX 34
