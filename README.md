@@ -34,11 +34,37 @@ do skompilowania programu, należy przygotować je zgodnie z [instrukcją](parti
 
 Ponieważ biblioteka Mimbrola może być skonfigurowana w różny sposób, uproszczona [instrukcja](mimbrola) konfiguracji.
 
+## Ustawienia menu Arduino IDE
+
+Dla płytek Dev Module wystarczy ustawić właściwy układ partycji, pozostawiając pozostałę parametry jako domyślne (w rqazie wątpliwości ustawić jak dla XIAO):
+```
+Partition Scheme: 4M Flash (Application Only)
+```
+
+Dla XIAO S3 ustawienia powinny być następujące:
+```
+Arduino Runs On: Core 1
+Core Debug Level: None
+CPU Frequency: 240MHz(WiFi)
+Erase All Flash Before Sketch Upload: Disabled
+Events Run On: Core 1
+Flash Mode: QIO 80 MHz
+Flash Size: 8 MB
+JTag Adapter: Disabled
+Partition Scheme: 8M, App=2880k, OTA, Mbrola pl1_alaw
+PSRAM: OPI PSRAM
+Upload Mode: UART0 / Hardware CDC
+Upload Speed: 921600
+USB CDC On Boot: Enabled
+USB DFU On Boot: Disabled
+USB Firmware MSC On Boot: Disabled
+USB Mode: Hardware CDC and JTAG
+```
+
+Jeśli kompilacja i upload się powiodą, należy połączyć się z płytką
+dowolnym terminalem Serial z prędkością 115200 i wpisać polecenie ```help```.
+
 To nie wszystko... pracuję dalej nad dokumentacją
-
-
-
-
 
 
 
