@@ -27,12 +27,14 @@ Na razie instrukcja jest niekompletna, proszę o cierpliwość!
   * Dallas Temperature (wraz z OneWire)
   * DHT Sensor Library
 * Dla instalacji na XIAO ESP32S3 i podobnych (min. 8 MB Flash, min. 2MB PSRAM)
-  * [polski głos pl1_alaw](https://github.com/ethanak/mimbrola_voices_pl) - żeby mogła mówić
+  * [polski głos pl1_alaw](https://github.com/ethanak/mimbrola_voices_pl) - żeby mogła mówić (patrz informacje w [instrukcji](mimbrola)
 
 Ponieważ standardowo w Arduino IDE nie zawiera układu partycji koniecznego
 do skompilowania programu, należy przygotować je zgodnie z [instrukcją](partitions).
 
-To nie wszystko... pracuję nad dokumentacją
+Ponieważ biblioteka Mimbrola może być skonfigurowana w różny sposób, uproszczona [instrukcja](mimbrola) konfiguracji.
+
+To nie wszystko... pracuję dalej nad dokumentacją
 
 
 
