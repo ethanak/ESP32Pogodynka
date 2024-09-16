@@ -27,7 +27,7 @@ Na razie instrukcja jest niekompletna, proszę o cierpliwość!
   * Dallas Temperature (wraz z OneWire)
   * DHT Sensor Library
 * Dla instalacji na XIAO ESP32S3 i podobnych (min. 8 MB Flash, min. 2MB PSRAM)
-  * [polski głos pl1_alaw](https://github.com/ethanak/mimbrola_voices_pl) - żeby mogła mówić (patrz informacje w [instrukcji](mimbrola)
+  * [polski głos pl1_ulaw](https://github.com/ethanak/mimbrola_voices_pl) - żeby mogła mówić (patrz informacje w [instrukcji](mimbrola)
 
 __UWAGA!
 Arduino-IDE w wersji 2.x oraz arduino-cli nie zawsze chcą użyć układu partycji
