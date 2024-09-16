@@ -11,12 +11,12 @@ wystarczy postępować zgodnie z [instrukcją](https://github.com/ethanak/ESP32G
 
 W folderze, w którym zainstalowano bibliotekę znajduje się folder data,
 przeznaczony do instalacji głosu. Do tego folderu należy skopiować folder
-pl_alaw, zawierający nagłówki polskiego głosu skompresowanego algorytmem A-law
+pl_ulaw, zawierający nagłówki polskiego głosu skompresowanego algorytmem µ-law
 i przystosowanego do odczytu z przygotowanej partycji.
 
 Następnie należy zamienić plik config.h z głównego folderu Mimbroli na załączony.
 
-Należy następnie pobrać plik [espola_alaw.blob](https://github.com/ethanak/mimbrola_voices_pl/raw/main/Mimbrola/espola_alaw.blob),
+Należy teraz pobrać plik [espola_pl1_ulaw.blob](https://github.com/ethanak/mimbrola_voices_pl/raw/main/Mimbrola/espola_pl1_ulaw.blob),
 zawierający właściwy polski głos.
 Plik ten należy wgrać do płytki S3 pod adres 0x5b0000 (zgodnie z układem
 partycji mbr8ota) np. programem [esptool](https://github.com/espressif/esptool)
@@ -49,5 +49,3 @@ python3 ~/.arduino15/packages/esp32/tools/esptool_py/*/esptool.py \
     write_flash  -z --flash_mode keep --flash_freq keep --flash_size keep\
     0x5b0000 "espola.blob" 
 ```
-
-

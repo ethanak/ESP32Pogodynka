@@ -73,6 +73,26 @@ static uint8_t showLocIP(Print &Ser, char *s)
      return 1;
 }
 
+static uint8_t showSrvAdr(Print &Ser, char *s)
+{
+    char buf[128], *c;
+    c=buf;
+    if (imAp) {
+        strcpy(buf,"SSID: " pogoApSSID ", Hasło: " pogoApPASS ", Serwer: http://");
+    }
+    else {
+        strcpy(buf,"Serwer: http://");
+    }
+    c=buf+strlen(buf);
+    if (!WiFiGetIP(c)) {
+        Ser.printf("Urządzenie niepodłączone\n");
+        return 0;
+    }
+    strcat(buf,":8080/");
+    Ser.printf("%s\n", buf);
+    return 1;
+}
+
 static uint8_t showVersion(Print &Ser, char *s)
 {
     Ser.printf("Wersja firmware: %s\n", firmware_version);
@@ -213,6 +233,7 @@ static const struct serCommand {
     {"dallas","Pokazuje podłączone urządzenia DS18B20",NULL,showDallas},
     {"showmac","Pokazuje adres MAC urządzenia",NULL,showLocMac},
     {"showip","Pokazuje adres IP urządzenia",NULL,showLocIP},
+    {"showsrv","Pokazuje URL serwera urządzenia",NULL,showSrvAdr},
     {"erase","Formatowanie NVS","Po podaniu parametru \"preferences\" wszystkie\n\
     zapisane dane zostaną usunięte a urządzenie zrestartowane",fmtNvm},
 #ifdef  CONFIG_IDF_TARGET_ESP32S3
@@ -292,7 +313,10 @@ void doSerialCmd(Print &Ser,char *str)
         Ser.printf("Nieznane polecenie %s\n",cmd);
         return;
     }
-    if (serCmds[i].fun) serCmds[i].fun(Ser,str);
+    if (serCmds[i].fun) {
+        serCmds[i].fun(Ser,str);
+        Ser.flush();
+    }
 }
 
 static struct cmdBuffer serialBuffer;

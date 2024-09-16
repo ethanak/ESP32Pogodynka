@@ -87,8 +87,15 @@ void WiFiGetMac(uint8_t *mac)
 
 uint8_t WiFiGetIP(char *buf)
 {
-    if (WiFi.status() != WL_CONNECTED) return 0;
-    String s=WiFi.localIP().toString();
-    strcpy(buf,s.c_str());
+    IPAddress IP;
+    if (!imAp) {
+        if (WiFi.status() != WL_CONNECTED) return 0;
+        IP=WiFi.localIP();
+    }
+    else {
+        IP=WiFi.softAPIP();
+    }
+    
+    strcpy(buf,IP.toString().c_str());
     return 1;
 }

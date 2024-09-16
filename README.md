@@ -11,7 +11,7 @@ Na razie instrukcja jest niekompletna, proszę o cierpliwość!
 
 * Arduino IDE z zainstalowanym core board ESP32 w wersji min. 3.0.4
 * Dodatkowe biblioteki
-  * [Mimbrola](https://github.com/ethanak/Mimbrola) - silnik syntezy mowy
+  * [Mimbrola](https://github.com/ethanak/Mimbrola) - silnik syntezy mowy, wersja co najmniej z 15.09.2024
   * [microlena](https://github.com/ethanak/microlena) - polski system TTS
   * [ESP32Gadacz](https://github.com/ethanak/ESP32Gadacz) - wrapper do microleny
   * [ESP8266Audio](https://github.com/earlephilhower/ESP8266Audio) - biblioteka do dźwięku

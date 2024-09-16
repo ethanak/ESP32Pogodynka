@@ -1,12 +1,17 @@
 #ifndef POGODA_H
 #define POGODA_H
 
-#define firmware_version "0.2.3"
+#define firmware_version "0.2.4"
 
 #define UNIT_USE_EVENTS 1
 #define S3_ALLOW_ALL_PINS 1
 
 // WiFi
+
+#define pogoApSSID "pogoda"
+#define pogoApPASS "wicherek"
+
+
 extern void initWiFi();
 
 //clock

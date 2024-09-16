@@ -548,6 +548,7 @@ static char *rainMaker(char *out)
     int opa = 0;
     int pos = 0;
     int rbeg,rend;
+    int was = 0;
     for (opa=0;;opa++) {
         for (;pos < rainyCount;pos++) if (rainyDay[pos]) break;
         if (pos >= rainyCount) break;
@@ -563,10 +564,20 @@ static char *rainMaker(char *out)
             strcpy(out,", ");
         out += strlen(out);
         
-        if (rbeg) out += sprintf(out," od %s",hoursodo[rbeg]);
-        if (rend >= 0 && rend < 24) out += sprintf(out," do %s",hoursodo[rend]);
+        if (rbeg) {
+            out += sprintf(out," od %s",hoursodo[rbeg]);
+            was = 1;
+        }
+        if (rend >= 0 && rend < 24) {
+            out += sprintf(out," do %s",hoursodo[rend]);
+            was = 1;
+        }
     }
     if (opa) {
+        if (!was) {
+            strcpy(out," całą dobę");
+            out += strlen(out);
+        }
         strcpy(out,". ");
         out += 2;
     }

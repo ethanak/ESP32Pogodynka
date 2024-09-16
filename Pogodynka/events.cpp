@@ -14,19 +14,22 @@ struct eEvent *eEvents;
 
 static I2C_eeprom *eeprom;
 
-
+static uint8_t eeAddress;
 
 uint8_t initEvents()
 {
     uint32_t magic;
     if (haveEE >= 0) return haveEE;
-    if (!I2DEVOK(0x57)) return haveEE=0;
-    eeprom = new I2C_eeprom(0x57,I2C_DEVICESIZE_24LC32);
+    for (eeAddress = 0x50; eeAddress < 0x58; eeAddress++) {
+        if (I2DEVOK(eeAddress)) break;
+    }
+    if (eeAddress > 0x57) return haveEE=0;
+    eeprom = new I2C_eeprom(eeAddress,I2C_DEVICESIZE_24LC32);
     if (!eeprom->begin()) {
         Serial.printf("Brak EEPROM\n");
         return haveEE=0;
     }
-    Serial.printf("EEPROM OK\n");
+    Serial.printf("EEPROM %02X\n",eeAddress);
     eEvents=(struct eEvent *)
 #ifdef BOARD_HAS_PSRAM
     ps_malloc

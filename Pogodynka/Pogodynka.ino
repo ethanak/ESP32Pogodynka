@@ -174,7 +174,7 @@ void setup_ap()
     Gadacz::waitAudio();
     Gadacz::saycst("Uruchamiam serwer");
     WiFi.mode(WIFI_AP);
-    WiFi.softAP("pogoda", "wicherek");
+    WiFi.softAP(pogoApSSID, pogoApPASS);
     initServer();
     startServer();
     Serial.printf("Aby uzyskać pomoc wpisz help\n");
@@ -422,7 +422,7 @@ void loop_ap()
     extern volatile uint8_t restartAPServer;
     bncBut.update();
     if (bncBut.fell()) {
-        strcpy(timebuf,"nazwa sieci: pogoda, hasło: wicherek. ");
+        strcpy(timebuf,"nazwa sieci: " pogoApSSID ", hasło: " pogoApPASS ". ");
         fmtServerPort(timebuf+strlen(timebuf),WiFi.softAPIP(),SERVER_PORT);
         Gadacz::say(timebuf);
     }
