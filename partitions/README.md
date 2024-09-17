@@ -85,7 +85,7 @@ XIAO_ESP32S3.menu.PartitionScheme.
 i dopisać za nią:
 
 ```
-XIAO_ESP32S3.menu.PartitionScheme.mbr8ota=8M, App=2880k, OTA, Mbrola pl1_alaw
+XIAO_ESP32S3.menu.PartitionScheme.mbr8ota=8M App=2880k OTA Mbrola pl1_ulaw
 XIAO_ESP32S3.menu.PartitionScheme.mbr8ota.build.partitions=mbr8ota
 XIAO_ESP32S3.menu.PartitionScheme.mbr8ota.upload.maximum_size=2949120
 ```
