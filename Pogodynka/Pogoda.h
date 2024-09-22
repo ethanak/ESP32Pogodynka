@@ -1,11 +1,17 @@
 #ifndef POGODA_H
 #define POGODA_H
 
-#define firmware_version "0.2.4"
+#define firmware_version "0.2.7"
 
 #define UNIT_USE_EVENTS 1
 #define S3_ALLOW_ALL_PINS 1
 
+
+// OTA tylko dla S3 z big flash
+
+#if !defined(DISABLE_OTA) && defined(CONFIG_IDF_TARGET_ESP32S3) && BOARD_HAS_BIG_FLASH  == 1
+#define ENABLE_OTA 1
+#endif
 // WiFi
 
 #define pogoApSSID "pogoda"
@@ -406,7 +412,7 @@ extern uint8_t RTC_DATA_ATTR debugMode;
 
 
 extern uint8_t haveCityFinder;
-#ifdef BOARD_HAS_PSRAM
+#if defined(BOARD_HAS_PSRAM) && (BOARD_HAS_BIG_FLASH == 1)
 #define USE_CITY_FINDER 1
 extern void initCityFinder();
 extern uint32_t extractCode(const char *cs);
@@ -417,7 +423,8 @@ extern int findByNamePart(const uint8_t *pat,int bstart);
 #endif
 
 
-#ifdef  CONFIG_IDF_TARGET_ESP32S3
+#ifdef ENABLE_OTA
+
 extern uint8_t otaPerform(Print &Ser, char *par);
 extern int runUpdateOta(Print &Ser);
 extern int checkOta();

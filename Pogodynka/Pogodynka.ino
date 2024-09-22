@@ -86,12 +86,13 @@ void i2cscan() {
 }
 
 
-int I2C_ClearBus() {
+int I2C_ClearBus(uint8_t slow) {
 
+    Wire.end();
   pinMode(PIN_SDA, INPUT_PULLUP); // Make PIN_SDA (data) and PIN_SCL (clock) pins Inputs with pullup.
   pinMode(PIN_SCL, INPUT_PULLUP);
 
-  delay(2500);  // Wait 2.5 secs. This is strictly only necessary on the first power
+  delay(slow ? 2500 : 100);  // Wait 2.5 secs. This is strictly only necessary on the first power
   // up of the DS3231 module to allow it to initialize properly,
   // but is also assists in reliable programming of FioV3 boards as it gives the
   // IDE a chance to start uploaded the program
@@ -201,6 +202,33 @@ void printWiFiMsg()
         Serial.printf("WiFi: %s\n", wifimsg[wsmsg-1]);
     }
 }
+
+static void initI2C()
+{
+    Wire.begin(PIN_SDA, PIN_SCL);
+    i2cscan();
+    int rclr = 0;
+    if (!I2DEVOK(0x68) && thrPrefs.ds3231) rclr = 2;
+    else {
+        if ((thrPrefs.trmin == DEVT_BMP180 || thrPrefs.trmin == DEVT_BMP280) &&
+            thrPrefs.i2cin &&  !I2DEVOK(thrPrefs.i2cin)) rclr |= 1;
+        else if ((thrPrefs.trmex == DEVT_BMP180 || thrPrefs.trmex == DEVT_BMP280) &&
+            thrPrefs.i2cex &&  !I2DEVOK(thrPrefs.i2cex)) rclr |= 1;
+        else if (thrPrefs.ds3231) {
+            int i;
+            for (i=0x50; i<0x57;i++) if (I2DEVOK(i)) break;
+            if (i > 0x57) rclr |= 1;
+        }
+    }
+    if (!rclr) {
+        return;
+    }
+    Serial.printf("Czyszczę magistralę I2C (%s)\n", (rclr &2) ? "powoli" : "szybko");
+    I2C_ClearBus(rclr & 2);
+    Wire.begin(PIN_SDA, PIN_SCL);
+    i2cscan();
+}
+
 void setup()
 {
     Serial.begin(115300);
@@ -229,9 +257,6 @@ void setup()
     bncBut.attach(PIN_BUTTON, INPUT_PULLUP);
     bncBut.interval(25);
     bncBut.update();
-#ifdef USE_CITY_FINDER
-    initCityFinder();
-#endif
     Gadacz::begin(WCLK_PIN, BCLK_PIN, DOUT_PIN);
     gadaczGetPrefs();
     if (!netPrefs.ssid[0]) imAp=1;
@@ -245,14 +270,15 @@ void setup()
         return;
     }
     
-    Gadacz::saycst("Dzień dobry");
+    Gadacz::saycst("Cześć");
     //scannet(1); // nierpotrzebne
-    I2C_ClearBus();
-    Wire.begin(PIN_SDA, PIN_SCL);
-    i2cscan();
+    initI2C();
     clockHardStatus=checkHardClock();
     if (clockHardStatus == 2) timerInitialized = 1;
     Serial.printf("RTC status: %d\n",clockHardStatus);
+#ifdef USE_CITY_FINDER
+    initCityFinder();
+#endif
     initEvents();
     //Serial.printf("Events %d\n",);
     //Serial.printf("City Finder %d\n",haveCityFinder);
@@ -286,6 +312,7 @@ char *timeString(char *buf, bool lng)
 
 uint8_t buttonLock=0;
 uint8_t pendingDbl=0;
+uint8_t externCmd;
 //uint32_t pendingStart;
 uint8_t getCommand()
 {
@@ -318,6 +345,14 @@ uint8_t getCommand()
         }
         return CMD_DATE;
     }
+    int ecmd=externCmd;
+    if (ecmd) {
+        pendingDbl=0;
+        if (Gadacz::isSpeaking()) return CMD_STOP;
+        externCmd=0;
+        return ecmd;
+    }
+    
     uint8_t _lc, _lch;
     static uint32_t _lcm=0;
     static uint32_t _pcm=0;
@@ -444,7 +479,7 @@ void loop()
     }
     printWiFiMsg();
     int glt = 0;
-#ifdef  CONFIG_IDF_TARGET_ESP32S3
+#ifdef ENABLE_OTA
     if (doOtaUpdate) {
         doOtaUpdate = 0;
         runUpdateOta(Serial);

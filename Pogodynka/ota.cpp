@@ -1,7 +1,6 @@
 #include <Arduino.h>
-
-#ifdef  CONFIG_IDF_TARGET_ESP32S3
 #include "Pogoda.h"
+#ifdef ENABLE_OTA
 #include <WiFiClientSecure.h>
 #include <HTTPClient.h>
 #include <HTTPUpdate.h>
@@ -9,7 +8,7 @@
 extern WiFiClientSecure secClient;
 extern void initRequest();
 static const char *otaHost = "milena.polip.com";
-static const char *otaPath = "/podynka/bin/";
+static const char *otaPath = "/podynku/bin/";
 
 static void mkOtaPath(char *buf, const char *fname)
 {

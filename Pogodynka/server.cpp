@@ -2,7 +2,7 @@
 #include <ESPAsyncWebServer.h>
 #include "Pogoda.h"
 
-#ifdef  CONFIG_IDF_TARGET_ESP32S3
+#ifdef ENABLE_OTA
 uint8_t doOtaUpdate = 0;
 #endif
 
@@ -86,14 +86,14 @@ static void handleGetData(AsyncWebServerRequest *request)
     getRespSpk(response,false);
     getRespWea(response,false);
     getRespGeo(response,false);
-#if defined(BOARD_HAS_PSRAM) || defined (UNIT_USE_EVENTS)
+#if defined(UNIT_USE_EVENTS)
     if (haveEE) response->printf(",\n\"linkcontainer\":\"kx kxdouble\"");
 #endif
-#ifdef BOARD_HAS_PSRAM
+#ifdef USE_CITY_FINDER
     if (haveCityFinder) response->printf(",\n\"citysel\":\"kx2a kx\"");
 #endif
     response->printf(",\n\"firmversion\":\"%s\"",firmware_version);
-#ifdef  CONFIG_IDF_TARGET_ESP32S3
+#ifdef ENABLE_OTA
     response->printf(",\n\"chkversion\":\"verbutton\"");
 #endif
     response->printf("}\n");
@@ -516,7 +516,7 @@ static void handleGetCal(AsyncWebServerRequest *request) {
     }
     response->printf("]\n");
     response->printf(",\"dualhead\":%s}",
-#if defined(BOARD_HAS_PSRAM) || defined (UNIT_USE_EVENTS)
+#if defined(UNIT_USE_EVENTS)
     haveEE ? "true" : "false"
 #else
     "false"
@@ -579,7 +579,7 @@ static void handleSetCal(AsyncWebServerRequest *request) {
     request->send(200,"text/plain","Nowy kalendarz został zapisany");
 }
 
-#if defined(BOARD_HAS_PSRAM) || defined(UNIT_USE_EVENTS)
+#if defined(UNIT_USE_EVENTS)
 
 static uint8_t isProperDate(int d, int m, int y)
 {
@@ -782,7 +782,7 @@ void handleCityFinder(AsyncWebServerRequest *request)
         
 #endif
 
-#ifdef  CONFIG_IDF_TARGET_ESP32S3
+#ifdef ENABLE_OTA
 
 void handleUpdateOta(AsyncWebServerRequest *request)
 {
@@ -830,11 +830,11 @@ void initServer()
 #ifdef USE_CITY_FINDER
         server.on("/city.cgi",handleCityFinder);
 #endif
-#ifdef  CONFIG_IDF_TARGET_ESP32S3
+#ifdef  ENABLE_OTA
         server.on("/checkota.cgi",handleCheckOta);
         server.on("/otaupdate.cgi",handleUpdateOta);
 #endif
-#if defined(BOARD_HAS_PSRAM) || defined(UNIT_USE_EVENTS)
+#if defined(UNIT_USE_EVENTS)
         server.on("/savevt.cgi",handleSavEvt);
         server.on("/revevt.cgi",handleRevEvt);
         server.on("/getevt.cgi",handleGetEvt);

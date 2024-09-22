@@ -485,6 +485,11 @@ uint8_t pfsSpk(Print &Ser, char *par)
         Ser.printf("Przywrócono parametry mowy\n");
         return 1;
     }
+    extern uint8_t externCmd;
+    if (!strcmp(par,"h") || !strcmp(par,"g")) {externCmd = CMD_HOUR;return 1;}
+    if (!strcmp(par,"d")) {externCmd = CMD_DATE;return 1;}
+    if (!strcmp(par,"s")) {externCmd = CMD_STOP;return 1;}
+    if (!strcmp(par,"p")) {externCmd = CMD_WEATHER;return 1;}
     gadaczGetPrefs();        
     Gadacz::say(par);
     return 1;

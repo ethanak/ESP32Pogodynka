@@ -1,4 +1,5 @@
-
+#include "config.h"
+#ifdef FINDER_USE_PARTITION
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -49,3 +50,4 @@ void *readFlashContent(uint32_t start, uint32_t size)
     }
     return whereto;
 }
+#endif

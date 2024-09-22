@@ -94,6 +94,6 @@ XIAO_ESP32S3.menu.PartitionScheme.mbr8ota.upload.maximum_size=2949120
 własciwego prefiksu zamiast ```XIAO_ESP32S3```).
 
 Po uruchomieniu Arduino IDE powinna być możliwość
-wyboru ```8M, App=2880k, OTA, Mbrola pl1_alaw``` z menu Partition Scheme.
+wyboru ```8M App=2880k OTA Mbrola pl1_ulaw``` z menu Partition Scheme.
 
 

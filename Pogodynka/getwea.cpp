@@ -55,7 +55,7 @@ bool getWeather()
     if (debugMode) Serial.printf("URL=%s\n",url);
     haveWeather=false;
     if (https.begin(secClient, url)) {  // HTTPS
-        https.setTimeout(750);
+        https.setTimeout(2000);
         int httpCode = https.GET();
         if (httpCode > 0) {
             if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY) {

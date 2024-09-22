@@ -133,9 +133,13 @@ static const struct serCommand {
     {"pitch","Wysokość głosu","parametr z zakresu 0 do 24",pfsPitch},
     {"vol","Głośność mowy","parametr z zakresu 0 do 24",pfsVol},
     {"contr","Wyrazistość mowy","parametr z zakresu 0 do 100",pfsContr},
-    {"spk","Wszystkie ustawienia mowy","bez parametru - pokazanie bieżących\n\
+    {"spk","Wszystkie ustawienia i testy mowy","bez parametru - pokazanie bieżących ustawień\n\
     z parametrem save - zapis ustawień\n\
     z parametrem restore - przywrócenie zapisanych.\n\
+    z parametrem h lub g - powiedz godzinę\n\
+    z parametrem d - powiedz godzinę i datę\n\
+    z parametrem p - powiedz godzinę, datę i prognozę\n\
+    z parametrem s - zatrzymaj mowę\n\
     Podanie dowolnego innego napisu spowoduje jego wypowiedzenie",pfsSpk},
     {"+geoloc","Położenie geograficzne",NULL,NULL},
     {"lon","Długość geograficzna","liczba ułamkowa (ujemna to długość zachodnia) albo\n\
@@ -208,15 +212,13 @@ static const struct serCommand {
     z parametrem restore - przywrócenie zapisanych\n\
     bez parametru - pokazanie bieżących",pfsClkClk},
     {"+hardware","Ustawienia sprzętowe",NULL,NULL},
-    {"debug","Włączenie komunikatów debugowania","Parametr on/off\n\
-    Nie jest zapisywany w pamięci flash",pfsSetDbg},
     {"iterm","Typ termometru wewnętrznego","Dopuszczalne: bmp180, bmp280, ds, none",pfsIterm},
     {"eterm","Typ termometru zewnętrznego","Dopuszczalne: dht11, dht22, ds, esp, none",pfsEterm},
     {"itermadr","Adres termometru wewnętrznego","dwie cyfry szesnastkowe dla I2C\n\
     osiem dwucyfrowych liczb szesnastkowych lub indeks dla DS18B20\n\
     Liczby mogą być oddzielane dowolnymi znakami",pfsItadr},
     {"etermadr","Adres termometru zewnętrznego","indeks dla DS18B20 z polecenia dallas\n\
-    lub sześć dwucyfrowych liczb sesnastkowych dla esp-now (adres MAC)\n\
+    lub sześć dwucyfrowych liczb szesnastkowych dla esp-now (adres MAC)\n\
     Liczby mogą być oddzielane dowolnymi znakami",pfsEtadr},
     {"espvalid","Okres ważności danych ze zdalnego czujnika",
     "Bez poarametru podaje okres.\n\
@@ -236,11 +238,8 @@ static const struct serCommand {
     {"showsrv","Pokazuje URL serwera urządzenia",NULL,showSrvAdr},
     {"erase","Formatowanie NVS","Po podaniu parametru \"preferences\" wszystkie\n\
     zapisane dane zostaną usunięte a urządzenie zrestartowane",fmtNvm},
+
 #ifdef  CONFIG_IDF_TARGET_ESP32S3
-    {"version","Pokazuje wersję firmware",NULL,showVersion},
-    {"ota","Operacje Over-the-Air","check - sprawdzenie czy jest nowa wersja\n\
-    update - aktualizacja\n\
-    update force - wymuszenie aktualizacji",otaPerform},
     {"pin","Ustawienia pinów XIAO ESP32-S3","bez parametru - pokazanie pinów\n\
     Z parametrem ir, scl, sda, wclk, bclk, dout, dht, ds, btn, btng\n\
     podaje numer przydzielonego pinu lub jeśli został podany kolejny\n\
@@ -253,6 +252,15 @@ static const struct serCommand {
 #else
     {"pins","Przyporządkowanie pinów DevKit",NULL, pfsPinny},
 #endif
+    {"+other","Pozostałe ustawienia",NULL,NULL},
+#ifdef  ENABLE_OTA
+    {"version","Pokazuje wersję firmware",NULL,showVersion},
+    {"ota","Operacje Over-the-Air","check - sprawdzenie czy jest nowa wersja\n\
+    update - aktualizacja\n\
+    update force - wymuszenie aktualizacji",otaPerform},
+#endif
+    {"debug","Włączenie komunikatów debugowania","Parametr on/off\n\
+    Nie jest zapisywany w pamięci flash",pfsSetDbg},    
     {"reset","Restart ESP",NULL, rstEsp},
     
     {NULL,NULL,NULL,NULL}};
