@@ -42,21 +42,25 @@ static void WiFi_connected(WiFiEvent_t event, WiFiEventInfo_t info) {
     Procure;
     wifiShowMsg=2;
     Vacate;
-    //Serial.printf("WiFi: połączono\n");
 }
 
 static void WiFi_gotIP(WiFiEvent_t event, WiFiEventInfo_t info) {
-    //Serial.printf("WiFi: uzyskano adres IP\n");
     Procure;
     wifiShowMsg=3;
     Vacate;
     clockAtConnect();
     startServer();
     startTelnet();
+    bool imac = false;
     if (thrPrefs.trmex == DEVT_ESPNOW && thrPrefs.exmac[0]) {
         setStationMac(thrPrefs.exmac);
+        imac = true;
     }
-    else {
+    if (thrPrefs.trmin == DEVT_ESPNOW && thrPrefs.inmac[0]) {
+        setStationMac(thrPrefs.inmac);
+        imac = true;
+    }
+    if (!imac) {
         deinitEspNow();
     }
 }
@@ -67,13 +71,9 @@ void initWiFi()
     WiFi.disconnect(true);
     if (!canConnect()) {
         wifiShowMsg=4;
-        //Serial.printf("Brak ustawień WiFi\n");
         return;
     }
     currentNet = netPrefs;
-    
-//    WiFi.onEvent(Wifi_connected,SYSTEM_EVENT_STA_CONNECTED);
-//    WiFi.onEvent(Got_IPAddress, SYSTEM_EVENT_STA_GOT_IP);
     WiFi.onEvent(WiFi_connected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_CONNECTED);
     WiFi.onEvent(Wifi_disconnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
     WiFi.onEvent(WiFi_gotIP, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_GOT_IP);

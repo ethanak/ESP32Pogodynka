@@ -7,7 +7,7 @@
 #include "Pogoda.h"
 
 static int wifi_chan;
-#define MAGIC_TEMP 0xc2
+#define MAGIC_TEMP 0xc3
 
 static struct espdata {
     uint8_t magic;
@@ -17,14 +17,16 @@ static struct espdata {
     uint8_t temph;
     uint8_t voltl;
     uint8_t volth;
+    uint8_t presl;
+    uint8_t presh;
 } current_espdata;
 
 uint8_t have_data = 0;
 
-float enoTemp, enoHumm;
-uint8_t enoAcc, enoStat;
-uint16_t enoVolt;
-uint32_t lastEno = 0;
+float enoTemp[2], enoHumm[2];
+uint8_t enoAcc[2], enoStat[2];
+uint16_t enoVolt[2],enoPres[2];
+uint32_t lastEno[2] = {0,0};
 
 
 extern uint8_t stationMac[];
@@ -32,13 +34,21 @@ void onDataReceive(const esp_now_recv_info_t *info, const uint8_t *data, int len
 {
    // printf("received %02x\n",*data);
     struct espdata ce;
-    //printMac(Serial,"SRC ",info->src_addr);
-    //printMac(Serial,"PFS ",thrPrefs.exmac);
-    //printMac(Serial,"DST ",info->des_addr);
-    //printMac(Serial,"STA ",stationMac);
-    
-    if (memcmp((void *)(info->src_addr),thrPrefs.exmac,6)) return;
+
+/*
+    printMac(Serial,"SRC ",info->src_addr);
+    printMac(Serial,"PFE ",thrPrefs.exmac);
+    printMac(Serial,"PFI ",thrPrefs.inmac);
+    printMac(Serial,"DST ",info->des_addr);
+    printMac(Serial,"STA ",stationMac);
+*/    
+    int which;
     if (memcmp((void *)(info->des_addr),stationMac,6)) return;
+    if (thrPrefs.trmex == DEVT_ESPNOW && !memcmp((void *)(info->src_addr),thrPrefs.exmac,6)) which=0;
+    else if (thrPrefs.trmin == DEVT_ESPNOW  && !memcmp((void *)(info->src_addr),thrPrefs.inmac,6)) which=1;
+    else {
+        return;
+    }
     
     //Serial.printf("ENOW Got data %d/%d\n", len,sizeof(ce));
     if (len != sizeof(ce)) return;
@@ -46,30 +56,35 @@ void onDataReceive(const esp_now_recv_info_t *info, const uint8_t *data, int len
     if (ce.magic != MAGIC_TEMP) return;
     int16_t temp = ce.templ | (ce.temph <<8);
     int16_t volt = ce.voltl | (ce.volth <<8);
-    if (debugMode) Serial.printf("ENOW %02x %d %d %d %d\n",ce.magic, ce.acc, ce.humm, temp,volt);
+    int16_t pres = ce.presl | (ce.presh <<8);
+    if (debugMode) Serial.printf("ENOW(%d) %02x %d %d %d %d\n",which,ce.magic, ce.acc, ce.humm, temp,volt);
     uint32_t t=millis();
     Procure;
-    lastEno = t;
-    enoStat = 0;
-    enoAcc = ce.acc;
-    enoVolt = volt;
-    if (enoAcc != 1) {
+    lastEno[which] = t;
+    enoStat[which] = 0;
+    enoAcc[which] = ce.acc;
+    enoVolt[which] = volt;
+    if (enoAcc[which] != 1) {
         if (ce.humm != 0xff) {
-            enoStat |= 2;
-            enoHumm = ce.humm;
+            enoStat[which] |= THV_HGR;
+            enoHumm[which] = ce.humm;
         }
         if (ce.temph != 0x7f) {
-            enoTemp = temp / 10.0;
-            enoStat |= 1;
+            enoTemp[which] = temp / 10.0;
+            enoStat[which] |= THV_TEMP;
+        }
+        if (ce.presh != 0x7f) {
+            enoPres[which] = pres;
+            enoStat[which] |= THV_PRES;
         }
     }
     //if (enoAcc < 0xfe)
-    enoStat |= 4;
+    enoStat[which] |= THV_ACU;
     Vacate;
         
 }
 
-static uint8_t espnowOK = 0, havePeerMac = 0;
+static uint8_t espnowOK = 0;
 static uint8_t PeerMac[6];
 //64:E8:33:8B:E5:5C
 
@@ -98,12 +113,13 @@ void setStationMac(uint8_t *newPeerMac)
 {
     //Serial.printf("ENOW start\n");
     memcpy((void *)PeerMac, (void *)newPeerMac,6);
-    havePeerMac=1;
     if (WiFi.status() != WL_CONNECTED) {
         Serial.printf("ESP-NOW: brak połączenia\n");
         return;
     }
-    if (!initEspNow()) return;
+    if (!espnowOK) {
+        if (!initEspNow()) return;
+    }
     if (!PeerMac[0]) return;
     esp_now_peer_info_t peerInfo;
     memset(&peerInfo, 0, sizeof(peerInfo));

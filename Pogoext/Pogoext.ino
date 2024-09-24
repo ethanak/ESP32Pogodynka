@@ -53,7 +53,7 @@ void loop()
     if (sentOK) {
         sentOK=0;
         //if (!usb_serial_jtag_is_connected() && !(realPrefes.flags & PFS_KEEPALIVE)) {
-        if (!chargeMode && !(realPrefes.flags & PFS_KEEPALIVE)) {
+        if (waitSeconds > 5 && !chargeMode && !(realPrefes.flags & PFS_KEEPALIVE)) {
             waitSeconds = 3;
             esp_sleep_enable_timer_wakeup((uint64_t)realPrefes.sleep * 1000000ULL);
             esp_deep_sleep_start();

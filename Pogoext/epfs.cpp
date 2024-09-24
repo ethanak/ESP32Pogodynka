@@ -34,7 +34,7 @@ void onDataSent(const uint8_t *mac, esp_now_send_status_t status)
 
 
 
-static uint8_t senten[7];
+static uint8_t senten[9];
 static uint16_t realVolt;
 bool chargeMode = false;
 uint16_t getPower()
@@ -69,7 +69,6 @@ uint8_t getAccu()
     if (ami >= 3400) return 3; // akumulator częściowo eozładowany
     return 4; // akumulator wymaga ładowania
 }
-uint8_t macadr[]={0x64,0xE8,0x33,0x8B,0xE5,0x5C};
 void initEN()
 {
     if (last_channel <= 0 || last_channel >= 13) {
@@ -77,12 +76,7 @@ void initEN()
     }
     WiFi.mode(WIFI_STA);
     WiFi.disconnect();
-//    Serial.println(WiFi.macAddress());
-//    wifi_set_macaddr(STATION_IF, &macadr[0]);
-//    Serial.print(WiFi.macAddress());
-
     esp_now_deinit();
-   // Serial.printf("Setting chan %d\n",last_channel);
     esp_wifi_set_channel(last_channel,(wifi_second_chan_t)0);
     esp_now_init();
     esp_now_register_send_cb(onDataSent);
@@ -108,14 +102,14 @@ enum {
 void dataSend()
 {
     if (sendStatus) return;
-    senten[0] = 0xc2;
+    senten[0] = 0xc3;
     senten[1] = getAccu();
     senten[5] = realVolt & 255;
     senten[6] = realVolt >> 8;
     int rc=readTemp();
     //Serial.printf("RV %d %f %f\n",rc,tempOut, hgrOut);
     if (rc & 1) {
-        int16_t t = tempOut * 10;
+        int16_t t = round(tempOut * 10);
         senten[4] = ((uint16_t) t) >> 8;
         senten[3] = ((uint16_t) t) & 255;
     }
@@ -128,12 +122,20 @@ void dataSend()
     else {
         senten[2] = 0xff;
     }
+    if (rc & 4) {
+        int16_t t = round(presOut);
+        senten[8] = ((uint16_t) t) >> 8;
+        senten[7] = ((uint16_t) t) & 255;
+    }
+    else {
+        senten[7] = senten[8] = 0x7f;
+    }
     sendStatus = SES_START;
 }
 
 void realSend()
 {
-    esp_now_send(realPrefes.station,senten,7);
+    esp_now_send(realPrefes.station,senten,9);
 }
 
 void trySend()
@@ -200,6 +202,7 @@ void initPFS()
         prefes.magic != MAGIC_EE) {
             memset((void *)&prefes,0,sizeof(struct prefes));
             prefes.magic = MAGIC_EE;
+            prefes.flags = PFS_KEEPALIVE;
             prefs.clear();
             prefs.putBytes("pfs",(void *)&prefes,sizeof(struct prefes));
     }
@@ -279,9 +282,9 @@ void pfsCalib(char *s)
 }
 
 static const char *const ttyp[]={
-    "none","ds","dht11","dht22"};
+    "none","ds","dht11","dht22","bmp"};
 static const char *const ttypf[]={
-    "Brak","DS28B20","DHT11","DHT22"};
+    "Brak","DS28B20","DHT11","DHT22","BME/BMP280"};
     
 void pfsTerm(char *s)
 {
@@ -308,31 +311,84 @@ void pfsTerm(char *s)
     
 }
 
+const char *const pinames[] ={
+    "t","scl","sda"
+};
+const char *const pindisp[] ={
+    "Termo","SCL","SDA"
+};
+
+void printpin(int i)
+{
+    int n=(i==0) ? prefes.pin: (i==1) ? prefes.sclpin : prefes.sdapin;
+    if (!n) {
+        Serial.printf("%s nieustawiony\n", pindisp[i]);
+    }
+    else {
+        Serial.printf("%s: %d\n", pindisp[i],n);
+    }
+}
+
 void pfsPin(char *s)
 {
+    int np;
     if (s && *s) {
-        int p =strtol(s,&s,10);
-        if (p < 0 || *s) {
-            Serial.printf("Błędny parametr\n");
+        const char *cmd=getToken(&s);
+        for (np=0;np<3;np++) if (!strcmp(pinames[np],cmd)) break;
+        if (np >= 3) {
+            Serial.printf("Błędny pin %s\n", cmd);
             return;
+        }
+        if (!*s) {
+            printpin(np);
+            return;
+        }
+        int p;
+        if (!strcmp(s,"off")) p = 0;
+        else {
+            p = strtol(s,&s,10);
+            if (p <0 || *s) {
+                Serial.printf("Błędny parametr\n");
+                return;
+            }
         }
         int i;
-        for (i=0;availPins[i];i++) if (p == availPins[i]) break;
-        if (!availPins[i]) {
-            Serial.printf("Błąd, dopuszczalne piny to: %d",availPins[0]);
-            for (i=1;availPins[i];i++) Serial.printf(", %d",availPins[i]);
-            Serial.printf(".\n");
-            return;
+        if (p) {
+            for (i=0;availPins[i];i++) if (p == availPins[i]) break;
+            if (!availPins[i]) {
+                Serial.printf("Błąd, dopuszczalne piny to: %d",availPins[0]);
+                for (i=1;availPins[i];i++) Serial.printf(", %d",availPins[i]);
+                Serial.printf(".\n");
+                return;
+            }
         }
-        prefes.pin = p;
+        if (np == 0) prefes.pin = p;
+        else if (np == 1) prefes.sclpin = p;
+        else prefes.sdapin = p;
+        Serial.printf("Ustawiono ");printpin(np);
+        return;
     }
-    if (!prefes.pin) printf("Pin termometru nieustawiony\n");
-    else printf("Pin termometru: %d\n",prefes.pin);
-    return;
+    for (np=0; np<3;np++) printpin(np);
 }
+
 
 void pfsSave(char *s)
 {
+    if (
+        (prefes.pin && ((prefes.pin == prefes.sclpin) || (prefes.pin == prefes.sdapin)))
+        ||
+        (prefes.sclpin && prefes.sclpin == prefes.sdapin)) {
+            Serial.printf("Błędna kombinacja pinów\n");
+            return;
+    }
+    if (prefes.termtyp == THR_BMP280 && (prefes.sclpin == 0 || prefes.sdapin == 0)) {
+        Serial.printf("Ustaw piny SCL i SDA dla termometru BMP280/BME280\n");
+        return;
+    }
+    if (prefes.termtyp && prefes.termtyp < THR_BMP280 && !prefes.pin) {
+        Serial.printf("Ten typ termometru wymaga ustawienia pinu\n");
+        return;
+    }
     commitFPS();
     delay(100);
     ESP.restart();

@@ -13,6 +13,9 @@ extern struct prefes {
     uint8_t flags;
     uint8_t kludge;
     uint8_t station[6];
+    uint8_t sclpin;
+    uint8_t sdapin;
+    
 } prefes, realPrefes;
 
 #define PFS_HAVE_CHARGER 1
@@ -28,9 +31,11 @@ extern const uint8_t availPins[];
 #define AVAILPINS 4,5,6,7,9,10
 #define USE_USB_TEST 1
 #elif defined(CONFIG_IDF_TARGET_ESP32C3)
-#define AVAILPINS 3,4,5,6,7,10
+#define AVAILPINS 2,3,4,5,6,7,10
 #define USE_USB_TEST 1
 #else
+#define A0 36
+#define A1 39
 #define AVAILPINS 4,5,16,17,18,19,22,23
 #endif
 
@@ -49,12 +54,13 @@ enum {
     THR_DS,
     THR_DHT11,
     THR_DHT22,
+    THR_BMP280,
     THR_MAX
     
 };
 
 
-extern float tempOut, hgrOut;
+extern float tempOut, hgrOut, presOut;
 extern void pfsSleep(char *s);
 extern void pfsCalib(char *s);
 extern void pfsTerm(char *s);

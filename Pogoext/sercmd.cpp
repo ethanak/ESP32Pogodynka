@@ -38,7 +38,7 @@ static const struct serCommand {
     {"help","Pomoc","Parametr - polecenie którego dotyczy pomoc",pfsHelp},
     {"mymac","Pokazuje adres MAC urządzenia",NULL, showLocMac},
     {"sensor","Typ podłączonego czujnika",
-        "Bez parametru pokazuje typ\n    Parametr none, ds, dht11 lub dht22 ustawia typ\n",pfsTerm},
+        "Bez parametru pokazuje typ\n    Parametr none, ds, dht11, dht22 lub bmp ustawia typ\n",pfsTerm},
     {"pin","Ustawienie pinu termometru",
         "Bez parametru pokazuje aktualny.\n\
     Parametr to numer pinu\n" ,pfsPin},

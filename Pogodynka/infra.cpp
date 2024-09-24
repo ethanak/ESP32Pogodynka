@@ -24,7 +24,7 @@ void irReceived(irproto brand, uint32_t code, size_t len, rmt_symbol_word_t *ite
         lastCodeMillis = millis();
         Vacate;
         if (monitorIR) 
-		Serial.printf("IR %s, code: %#x, bits: %d\n",  proto[brand].name, code, len);
+            Serial.printf("IR %s, code: %#x, bits: %d\n",  proto[brand].name, code, len);
 	}
 }
 

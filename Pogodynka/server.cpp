@@ -389,7 +389,7 @@ static void handleGetAp(AsyncWebServerRequest *request)
 static void ptmptd(AsyncResponseStream *response, const char *name,uint8_t flag, float val)
 {
     response->printf(",\n\"%s\":", name);
-    if (flag) response->printf("%.5f",val);
+    if (flag) response->printf("%.1f",val);
     else response->printf("null");
 }
 
@@ -397,6 +397,9 @@ struct thermoData *serverCurData = NULL;
 void handleCurData(AsyncWebServerRequest *request)
 {
     struct thermoData tdata;
+    static const char *const acnames[]={
+            "brak","ładowanie","naładowany","wymaga ładowania","rozładowany"};
+            
     if (serverCurData) {
         request->send(500,"text/plain","Trwa pobieranie danych");
         return;
@@ -413,14 +416,23 @@ void handleCurData(AsyncWebServerRequest *request)
     }
     AsyncResponseStream *response = request->beginResponseStream("application/json");
     response->printf("{\n\"extpower\":");
-    if (tdata.flags & THF_ACC) response->printf("{%d,%d}",tdata.accStatus,tdata.accVoltage);
-    else response->printf("null");
+    if (tdata.flags & THV_EACU) response->printf("[%d,%d,\"%s\"]",
+        tdata.accStatusExt,tdata.accVoltageOut,
+        acnames[constrain(tdata.accStatusExt,0,4)]);
+    else response->printf("[null,null,\"brak danych\"]");
 
-    ptmptd(response, "tempin",tdata.flags & THF_TMPIN, tdata.tempIn);
-    ptmptd(response, "tempout",tdata.flags & THF_TMPEX, tdata.tempOut);
-    ptmptd(response, "pressure",tdata.flags & THF_PRESS, tdata.press);
-    ptmptd(response, "hummout",tdata.flags & THF_HGROUT, tdata.hygrOut);
-    ptmptd(response, "hummin",tdata.flags & THF_HGRIN, tdata.hygrIn);
+    response->printf(",\n\"inpower\":");
+    if (tdata.flags & THV_ACU) response->printf("[%d,%d,\"%s\"]",
+        tdata.accStatusIn,tdata.accVoltageIn,
+        acnames[constrain(tdata.accStatusIn,0,4)]);
+    else response->printf("[null,null,\"brak danych\"]");
+
+    ptmptd(response, "tempin",tdata.flags & THV_TEMP, tdata.tempIn);
+    ptmptd(response, "tempout",tdata.flags & THV_ETEMP, tdata.tempOut);
+    ptmptd(response, "pressin",tdata.flags & THV_PRES, tdata.pressIn);
+    ptmptd(response, "pressout",tdata.flags & THV_EPRES, tdata.pressOut);
+    ptmptd(response, "hummin",tdata.flags & THV_HGR, tdata.hygrIn);
+    ptmptd(response, "hummout",tdata.flags & THV_EHGR, tdata.hygrOut);
         response->printf("}\n");
     request->send(response);
 }

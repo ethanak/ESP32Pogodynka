@@ -1,7 +1,7 @@
 #ifndef POGODA_H
 #define POGODA_H
 
-#define firmware_version "0.2.7"
+#define firmware_version "0.2.9"
 
 #define UNIT_USE_EVENTS 1
 #define S3_ALLOW_ALL_PINS 1
@@ -188,21 +188,28 @@ extern void restoreEvts();
 
 struct thermoData {
     uint8_t flags;
-    uint8_t accStatus;
-    uint16_t press;
+    uint8_t accStatusIn;
+    uint8_t accStatusExt;
+    uint8_t kludge;
+    uint16_t pressIn;
+    uint16_t pressOut;
     float tempIn;
     float tempOut;
     float hygrIn;
     float hygrOut;
-    uint16_t accVoltage;
+    uint16_t accVoltageIn;
+    uint16_t accVoltageOut;
 };
 
-#define THF_ACC 0x10
-#define THF_TMPIN 1
-#define THF_PRESS 2
-#define THF_TMPEX 4
-#define THF_HGROUT 8
-#define THF_HGRIN 0x20
+
+#define THV_TEMP 1
+#define THV_PRES 2
+#define THV_HGR 4
+#define THV_ACU 8
+#define THV_ETEMP (THV_TEMP << 4)
+#define THV_EPRES (THV_PRES << 4)
+#define THV_EHGR (THV_HGR << 4)
+#define THV_EACU (THV_ACU << 4)
 
     
 
@@ -238,6 +245,7 @@ extern struct thrPrefs {
     uint8_t exmac[6];
     uint8_t dsain[8];
     uint8_t dsaex[8];
+    uint8_t inmac[6];
 } thrPrefs;
 
     
@@ -321,23 +329,25 @@ enum {
     DEVT_BMP180,
     DEVT_BMP280,
     DEVT_ESPNOW,
+    DEVT_BME280,
     //DEVT_AHT20,
     DEVT_MAX};
     
 extern uint8_t getDHT();
-extern uint8_t getBMP280();
+//extern uint8_t getBMP280();
+extern uint8_t getBME280();
 extern uint8_t initThermo();
-extern float tempIn, pressIn,tempOut, hgrOut;
+extern float tempIn, pressIn,tempOut, hgrOut, hgrIn, pressOut;
 extern uint8_t owcount;
 extern uint8_t owids[2][8];
 
 extern uint8_t indexOneWire();
 extern float daltemp[2];
 
-extern float enoTemp, enoHumm;
-extern uint8_t enoAcc, enoStat;
-extern uint16_t enoVolt;
-extern uint32_t lastEno;
+extern float enoTemp[], enoHumm[];
+extern uint8_t enoAcc[], enoStat[];
+extern uint16_t enoVolt[],enoPres[];
+extern uint32_t lastEno[];
 extern struct thermoData *serverCurData;
 extern uint8_t getDallas();
 uint8_t getTemperatures();

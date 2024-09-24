@@ -157,30 +157,24 @@ nzip*/
     cf_mlen = *(uint32_t *)mmemo; mmemo+= 4;
     cf_nzip = *(uint32_t *)mmemo; mmemo+= 4;
     uint32_t n=*(uint32_t *)mmemo; mmemo+= 4;
-    //Serial.printf("WOJ %d %d %d\n", n,cf_plen,n/sizeof(*cf_woj));
     cf_woj = (int *) mmemo;
     mmemo += n;
 
     n=*(uint32_t *)mmemo; mmemo+= 4;
-    //Serial.printf("PWT %d %d %d\n", n,cf_plen,n/sizeof(*cf_powiat));
     cf_powiat = (int *) mmemo;
     mmemo += n;
 
     n=*(uint32_t *)mmemo; mmemo+= 4;
-    //Serial.printf("MIA %d %d %d\n", n,cf_mlen,n/sizeof(*cf_miasta));
     cf_miasta = (struct cf_miasto *) mmemo;
     mmemo += n;
     
     n=*(uint32_t *)mmemo; mmemo+= 4;
-    //Serial.printf("ZIP %d %d %d\n", n,cf_zips,n/sizeof(*cf_zips));
     cf_zips = (struct cf_zip *) mmemo;
     mmemo += n;
 
     n=*(uint32_t *)mmemo; mmemo+= 4;
-    //Serial.printf("STR %d\n",n);
     cf_strings = mmemo;
     mmemo += n;
-    //printf("SIZ %d %d\n",datasize, mmemo -cf_mainMemo);
 }
 
 // interface

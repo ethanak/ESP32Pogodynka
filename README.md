@@ -22,7 +22,7 @@ Na razie instrukcja jest niekompletna, proszę o cierpliwość!
   * Time
   * I2C_EEPROM
   * ESP_Telnet
-  * BMP280
+  * Bme280 [ta wersja](https://github.com/malokhvii-eduard/arduino-bme280)
   * BMP180MI
   * Dallas Temperature (wraz z OneWire)
   * DHT Sensor Library

@@ -289,7 +289,6 @@ const char *getCalEvent(uint8_t tomorrow)
 
 bool getLocalTime()
 {
-    //Serial.printf("HCS = %d\n",clockHardStatus);
     if (!timerInitialized) return false;
     if (clockHardStatus == 2) {
         unixTime = readHardClock();
@@ -363,7 +362,6 @@ uint32_t readHardClock()
     if (Wire.endTransmission()) return 0;
     Wire.requestFrom(CLOCK_ADR,7);
     for (i=0;i<7;i++) dsbuf[i]=bcdToDec(Wire.read());
-    //for (i=0;i<7;i++) Serial.printf("B %d %02X\n",i,dsbuf[i]);
     struct tm ltm;
     memset(&ltm, 0, sizeof(ltm));
     ltm.tm_year=100+dsbuf[6];
@@ -373,9 +371,6 @@ uint32_t readHardClock()
     ltm.tm_min=dsbuf[1];
     ltm.tm_sec=dsbuf[0];
     uint32_t uy=mktime(&ltm);
-    //char axbuf[64];
-    //strftime(axbuf,63,"%d:%m:%Y %H:%M:%S %a",&ltm);
-    //Serial.printf("TA %s\n",axbuf);
     return uy;
 }
 

@@ -650,9 +650,9 @@ uint8_t pfsGeo(Print &Ser, char *par)
 }
 
 static const char * const tmprNames[]={
-    "none","ds","dht11","dht22","bmp180","bmp280","esp",NULL};
+    "none","ds","dht11","dht22","bmp180","bmp280","esp","bme280",NULL};
 static const char * const tmprNamesD[]={
-    "brak","DS18B20","DHT11","DHT22","BMP180","BMP280","esp-now",NULL};
+    "brak","DS18B20","DHT11","DHT22","BMP180","BMP280","esp-now","BME280",NULL};
 
 
 void printMac(Print &Ser, const char *pfx, const uint8_t *mac)
@@ -664,7 +664,7 @@ void printMac(Print &Ser, const char *pfx, const uint8_t *mac)
 static void printTermDev(Print &Ser, uint8_t typ, uint8_t i2cadr, const uint8_t *dsadr,const uint8_t *mac=NULL,bool addrobly=false)
 {
     Ser.printf("%s",tmprNamesD[typ]);
-    if (typ == DEVT_BMP180 || typ == DEVT_BMP280) {
+    if (typ == DEVT_BMP180 || typ == DEVT_BMP280 || typ == DEVT_BME280) {
         if (i2cadr) Ser.printf(", adres 0x%02x\n",i2cadr);
         else Ser.printf(", adres nieustawiony\n");
         return;
@@ -692,11 +692,11 @@ static void printTermDev(Print &Ser, uint8_t typ, uint8_t i2cadr, const uint8_t 
 
 uint8_t pfsIterm(Print &Ser, char *par)
 {
-    static uint16_t ohay = 1 | 2 |  0x10 | 0x20;
+    static uint16_t ohay = 1 | 2 |  0x10 | 0x20 | 0x40 | 0x80;
     
     if (!par || !*par) {
         Ser.printf("Urządzenie wewnątrz: ");
-        printTermDev(Ser, thrPrefs.trmin, thrPrefs.i2cin,thrPrefs.dsain);
+        printTermDev(Ser, thrPrefs.trmin, thrPrefs.i2cin,thrPrefs.dsain,thrPrefs.inmac);
         return 1;
     }
     int i;
@@ -713,7 +713,7 @@ uint8_t pfsIterm(Print &Ser, char *par)
     }
     thrPrefs.trmin = i;
     Ser.printf("Ustawiono urządzenie wewnątrz: %s\n",tmprNamesD[thrPrefs.trmin]);
-    if (i == DEVT_BMP280) {
+    if (i == DEVT_BMP280 || i == DEVT_BME280) {
         if (I2DEVOK(0x76)) thrPrefs.i2cin = 0x76;
         else if (I2DEVOK(0x77)) thrPrefs.i2cin = 0x77;
         else thrPrefs.i2cin=0;
@@ -722,9 +722,9 @@ uint8_t pfsIterm(Print &Ser, char *par)
         thrPrefs.i2cin = 0x77;
     }
 
-    if (i == DEVT_BMP280 || i == DEVT_BMP280) {
+    if (i == DEVT_BMP280 || i == DEVT_BMP280 || i == DEVT_BME280) {
         if (thrPrefs.i2cin) Ser.printf("Ustawiono automatycznie adres 0x%02X\n",thrPrefs.i2cin);
-        else Ser.printf("Urządzenie niepodłączone, ustaw adres pol;eceniem itaddr\n");
+        else Ser.printf("Urządzenie niepodłączone, ustaw adres poleceniem itaddr\n");
     }
     return 1;
 }
@@ -797,7 +797,7 @@ uint8_t pfsEterm(Print &Ser, char *par)
 uint8_t pfsHard(Print &Ser, char *par)
 {
     if (!*par) {
-        Ser.printf("Wewnątrz: "); printTermDev(Ser, thrPrefs.trmin, thrPrefs.i2cin,thrPrefs.dsain);
+        Ser.printf("Wewnątrz: "); printTermDev(Ser, thrPrefs.trmin, thrPrefs.i2cin,thrPrefs.dsain,thrPrefs.inmac);
         Ser.printf("Na zewnątrz: ");printTermDev(Ser, thrPrefs.trmex, thrPrefs.i2cex,thrPrefs.dsaex,thrPrefs.exmac);
         Ser.printf("Dane zdalnego czujnika ważne przez %d minut\n",thrPrefs.espwait);
         Ser.printf("Źródło czasu: %s\n",thrPrefs.ds3231 ? "zegar sprzętowy": "internet");
@@ -903,7 +903,7 @@ uint8_t pfsEtadr(Print &Ser, char *par)
 uint8_t pfsItadr(Print &Ser, char *par)
 {
     if (!par || !*par) {
-        printTermDev(Ser, thrPrefs.trmin, thrPrefs.i2cin,thrPrefs.dsain);
+        printTermDev(Ser, thrPrefs.trmin, thrPrefs.i2cin,thrPrefs.dsain,thrPrefs.inmac);
         return 1;
     }
     int ia,err=0;
@@ -924,11 +924,15 @@ uint8_t pfsItadr(Print &Ser, char *par)
         err = getDSAdr(par,thrPrefs.dsain);
         break;
 
+        case DEVT_ESPNOW:
+        err = getExtMac(par, thrPrefs.inmac);
+        break;
+
         default:
         err=3;
     }
     if (!err) {
-        Ser.printf("Ustawiono: ");printTermDev(Ser, thrPrefs.trmin, thrPrefs.i2cin,thrPrefs.dsain);
+        Ser.printf("Ustawiono: ");printTermDev(Ser, thrPrefs.trmin, thrPrefs.i2cin,thrPrefs.dsain,thrPrefs.inmac);
         return 1;
     }
     Ser.printf("%s\n",adrErrors[err-1]);

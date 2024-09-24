@@ -212,7 +212,7 @@ static const struct serCommand {
     z parametrem restore - przywrócenie zapisanych\n\
     bez parametru - pokazanie bieżących",pfsClkClk},
     {"+hardware","Ustawienia sprzętowe",NULL,NULL},
-    {"iterm","Typ termometru wewnętrznego","Dopuszczalne: bmp180, bmp280, ds, none",pfsIterm},
+    {"iterm","Typ termometru wewnętrznego","Dopuszczalne: bmp180, bmp280, bme280, ds, esp, none",pfsIterm},
     {"eterm","Typ termometru zewnętrznego","Dopuszczalne: dht11, dht22, ds, esp, none",pfsEterm},
     {"itermadr","Adres termometru wewnętrznego","dwie cyfry szesnastkowe dla I2C\n\
     osiem dwucyfrowych liczb szesnastkowych lub indeks dla DS18B20\n\

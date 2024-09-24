@@ -546,7 +546,6 @@ void loop()
         
         int tin;
         int trmpo, trmpi,presi;
-        //Serial.printf("Get local time\n");
         akuSaidCntr++;
 
         if (getLocalTime()) {
@@ -555,67 +554,107 @@ void loop()
         }
         timebuf[0]=0;
         tin = getTemperatures();
-        //Serial.printf("TINA=%d\n",tin);
-        if (glt < 2) tin &=5 | 16;
-        if (tin & 4) trmpo = (int)round(tempOut);
-        if (tin & 1) trmpi = (int)round(tempIn);
+        if (debugMode) Serial.printf("Temp flags = %02x\n",tin);
+        if (glt < 2) tin &= THV_TEMP | THV_ETEMP;//5 | 16;
+        else {
+            if (!(weaPrefs.flags & SPKWEA_PRESS))
+                tin &= ~(THV_PRES | THV_EPRES);
+            if (!weaPrefs.flags & SPKWEA_HYGROUT) tin &= ~THV_EHGR;
+            if (!weaPrefs.flags & SPKWEA_HYGRIN) tin &= ~THV_HGR;
+        }
         
-        if ((tin & 3) == 3) {
-            if (weaPrefs.flags & SPKWEA_PRESS) {
-                float f=pressIn;
+        if (tin & THV_ETEMP) trmpo = (int)round(tempOut);
+        if (tin & THV_TEMP) trmpi = (int)round(tempIn);
+        
+        if ((tin & THV_TEMP) && (tin & (THV_PRES | THV_EPRES))) {
+            int what = 0;
+            if ((tin & (THV_TEMP | THV_PRES)) == (THV_TEMP | THV_PRES)) what = 1;
+            else if ((tin & (THV_ETEMP | THV_EPRES)) == (THV_ETEMP | THV_EPRES)) what = 1;
+            float f;
+            if (!what) tin &= ~ (THV_PRES | THV_EPRES);
+            else {
+                f= (what == 1) ? pressIn : pressOut;
                 if (weaPrefs.flags & SPKWEA_REPRESS) {
                     int h = geoPrefs.elev;
                     if (h == ELEV_AUTO) h=geoPrefs.autoelev;
-                    if (h == ELEV_AUTO) tin &= ~2;
-                    else f=pressIn * exp((0.03415 * h) / (273.16 + tempIn));
+                    if (h == ELEV_AUTO) tin &= ~(THV_PRES | THV_EPRES);
+                    else {
+                        f=f * exp((0.03415 * h) /
+                            (273.16 + ((what == 1) ? tempIn : tempOut)));
+                    }
                 }
-                if (tin & 2) presi = (int)round(f);
+                if (tin & (THV_PRES | THV_EPRES)) presi = (int)round(f);
             }
-            else tin &= ~2;
         }
-//        Serial.printf("TIN=%d\n",tin);
-        if (tin & (5 | 16)) {
-        //if (0) {
-            //Gadacz::waitAudio();
+        else tin &= ~(THV_PRES | THV_EPRES);
+        if (tin & (THV_TEMP | THV_ETEMP | THV_ACU | THV_EACU)) {
             char *c=timebuf;
-            if (tin & 5) {
+            if (tin & (THV_TEMP | THV_ETEMP)) {
                 strcpy(c,"Temperatura ");c+=strlen(c);
-                if (tin & 1) {
+                if (tin & THV_TEMP) {
                     c += sprintf(c,"%s %d°", weaPrefs.inname, trmpi);
                 }
-                if (tin & 4) {
-                    if (tin & 1) {
+                if (tin & THV_ETEMP) {
+                    if (tin & THV_TEMP) {
                         strcpy(c,", ");
                         c+=2;
                     }
                     c += sprintf(c,"%s %d°", weaPrefs.outname, trmpo);
                 }
                 strcpy(c,". "); c+=2;
-                if (tin & 2) {
-                    c+=sprintf(c,"ciśnienie %d hPa%c ",presi,(tin & 8) ? ',': '.');
+                if (tin & (THV_PRES | THV_EPRES)) {
+                    c+=sprintf(c,"ciśnienie %d hPa%c ",presi,(tin & (THV_HGR | THV_EHGR)) ? ',': '.');
                 }
-                if (tin & 8) c+= sprintf(c,"Wilgotność %d%%. ",(int)(round(hgrOut)));
+                if (tin & (THV_HGR | THV_EHGR)) {
+                    strcpy(c,"Wilgotność ");c+=strlen(c);
+                    if (tin & THV_HGR) {
+                        if (tin & THV_EHGR) 
+                            c += sprintf(c,"%s %d%%",weaPrefs.inname,(int)(round(hgrIn)));
+                        else
+                            c += sprintf(c,"%d%%",(int)(round(hgrIn)));
+                    }
+                    if (tin & THV_EHGR) {
+                        if (tin & THV_HGR) {
+                            c += sprintf(c,", %s %d%%",weaPrefs.outname,(int)(round(hgrOut)));
+                        }
+                        else {
+                            c += sprintf(c,"%d%%",(int)(round(hgrOut)));
+                        }
+
+                    }
+                }
             }
-            if (tin & 16) {
+            if (tin & THV_EACU) {
                 uint8_t aena = 0;
-                if (enoAcc >= 3) {
-                    if (!akuSaid || (enoAcc > 3 && glt > 1)) {
+                if (enoAcc[0] >= 3) {
+                    if (!akuSaid || (enoAcc[0] > 3 && glt > 1)) {
                         aena = 1;
                         akuSaid = 1;
                         akuSaidTime = millis();
                     }
                 }
                 if (aena) {
-                    strcpy(c, (enoAcc == 3) ? "Niski poziom akumulatora. " : "Uwaga, akumulator rozładowany. ");
+                    sprintf(c, (enoAcc[0] == 3) ? "Niski poziom akumulatora %s. " : "Uwaga, akumulator %s rozładowany. ", weaPrefs.outname);
+                }
+            }
+            if (tin & THV_ACU) {
+                uint8_t aena = 0;
+                if (enoAcc[0] >= 3) {
+                    if (!akuSaid || (enoAcc[0] > 3 && glt > 1)) {
+                        aena = 1;
+                        akuSaid = 1;
+                        akuSaidTime = millis();
+                    }
+                }
+                if (aena) {
+                    sprintf(c, (enoAcc[0] == 3) ? "Niski poziom akumulatora %s. " : "Uwaga, akumulator %s rozładowany. ", weaPrefs.inname);
                 }
             }
             
             ctlSpeakTemp = 1;
             
         }
-        //if (glt == 2 || (glt == 3 && (weaPrefs.flags & SPKWEA_HALWAYS))) {
         if (glt == 2 || (weaPrefs.flags & SPKWEA_HALWAYS)) {
-        //if (0) {
             const char *tdh=NULL, *tmh=NULL, *tdc=NULL, *tmc=NULL,
                 *tde=NULL, *tme=NULL;
             if (glt > 1) {

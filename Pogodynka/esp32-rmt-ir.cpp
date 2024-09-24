@@ -173,7 +173,6 @@ uint32_t nec_check(rmt_symbol_word_t *item, size_t &len){
 		}else if(checkbit(item[i], proto[NEC].one_high, proto[NEC].one_low)){
 			code |= (m >> (i - 1) );
 		}else if(!checkbit(item[i], proto[NEC].zero_high, proto[NEC].zero_low)){
-			//Serial.printf("BitError i:%d\n",i);
 			return 0;
 		}
 	}
@@ -209,10 +208,6 @@ uint32_t hgw_check(rmt_symbol_word_t *item, size_t &len) {
     uint32_t m = 0x80000000;
 	uint32_t code = 0;
 	for(int j = 0; j < 32; j++,i++){
-        /*
-        Serial.printf("%d %d, %d %d, %d %d\n",
-            item[i].level0, item[i].level1, item[i].duration0, item[i].duration1,
-            proto[HGW].one_high, proto[HGW].one_low); */
 		if(checkbit(item[i], proto[HGW].one_high, proto[HGW].one_low)){
 			code |= (m >> j);
 		}
