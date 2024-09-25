@@ -39,9 +39,10 @@ static const struct serCommand {
     {"mymac","Pokazuje adres MAC urządzenia",NULL, showLocMac},
     {"sensor","Typ podłączonego czujnika",
         "Bez parametru pokazuje typ\n    Parametr none, ds, dht11, dht22 lub bmp ustawia typ\n",pfsTerm},
-    {"pin","Ustawienie pinu termometru",
-        "Bez parametru pokazuje aktualny.\n\
-    Parametr to numer pinu\n" ,pfsPin},
+    {"pin","Ustawienie pinów termomentu i i2c",
+        "Bez parametru pokazuje aktualne piny.\n\
+    Z parametrem t, scl lub sda pokazuje ustawiony pin termometru lub linii i2c\n\
+    Jeśli drugim parametrem będzie liczba, ustawia odpowiedni pin",pfsPin},
     {"peer","Adres głównego urządzenia",
         "Bez parametru pokazuje aktualny adres\nSześć dwucyfrowych liczb sesnastkowych (adres MAC)\n\
     Liczby mogą być oddzielane dowolnymi znakami",pfsPeer},
