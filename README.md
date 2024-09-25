@@ -63,9 +63,12 @@ Przykładowy układ zmontowany na płytce stykowej:
 Zmieściły się tam:
 
 * Dodatkowy przycisk RESET
-* Odbiornik podczerwieni TSOP31246
+* Odbiornik podczerwieni TSOP31236
 * Czujnik BMP280
 
+### Konstrukcja urządzenia
+
+Patrz [instrukcja konstrukcji](/docs/POGODA.md)
 
 _ciąg dalszy nastąpi_
 
