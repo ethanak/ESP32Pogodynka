@@ -567,9 +567,12 @@ void loop()
         if (tin & THV_TEMP) trmpi = (int)round(tempIn);
         
         if ((tin & THV_TEMP) && (tin & (THV_PRES | THV_EPRES))) {
-            int what = 0;
-            if ((tin & (THV_TEMP | THV_PRES)) == (THV_TEMP | THV_PRES)) what = 1;
-            else if ((tin & (THV_ETEMP | THV_EPRES)) == (THV_ETEMP | THV_EPRES)) what = 1;
+            // tylko jedna wartość ciśnienia, wewnętrzny ma priorytet
+            int what = 0; // 1 - wewn, 2 - zewn
+            if ((tin & (THV_TEMP | THV_PRES)) == (THV_TEMP | THV_PRES))
+                what = 1;
+            else if ((tin & (THV_ETEMP | THV_EPRES)) == (THV_ETEMP | THV_EPRES))
+                what = 2;
             float f;
             if (!what) tin &= ~ (THV_PRES | THV_EPRES);
             else {
