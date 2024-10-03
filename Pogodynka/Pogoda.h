@@ -380,6 +380,7 @@ extern const char * const monthNM[];
 
 
 #define BADGEO (200 * 3600)
+#define NUNGEO (201 * 3600)
 
 extern int32_t parseGeo(Print &Ser, char *par, char *dop, int mxd);
 

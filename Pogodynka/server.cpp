@@ -210,9 +210,17 @@ void handleUniSet(AsyncWebServerRequest *request)
             request->send(200,"text/plain","Błędna wartość długości");
             return;
         }
+        if (lon == NUNGEO) {
+            request->send(200,"text/plain","Niejednoznaczny zapis długości");
+            return;
+        }
         int lat = parseGeo(Serial, (char *)request->arg("geolat").c_str(), "nNsS", 90);
         if (lat == BADGEO) {
             request->send(200,"text/plain","Błędna wartość szerokości");
+            return;
+        }
+        if (lat == NUNGEO) {
+            request->send(200,"text/plain","Niejednoznaczny zapis szerokości");
             return;
         }
         int elev;

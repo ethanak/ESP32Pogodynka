@@ -496,7 +496,7 @@ uint8_t pfsSpk(Print &Ser, char *par)
         
 }
 
-
+#if 0
 int32_t parseGeo(Print &Ser, char *par, char *dop, int mxd)
 {
     int minus = 0;
@@ -539,6 +539,64 @@ int32_t parseGeo(Print &Ser, char *par, char *dop, int mxd)
     if (minus) deg = -deg;
     return deg;
 }
+#else
+int32_t parseGeo(Print &Ser, char *par, char *dop, int mxd)
+{
+    uint8_t minus = 0;
+    int deg,ndit;
+    if (*par == '-') {
+        par++;
+        minus=1;
+        while (isspace(*par)) par++;
+    }
+    if (!isdigit(*par)) return BADGEO;
+    deg = strtol(par, (char **) &par, 10) * 3600;
+    if (*par == '.' && isdigit(par[1])) {
+        const char *s=par+1;
+        ndit = 0;
+        while (isdigit(*s)) {
+            ndit++;
+            s++;
+        }
+        // jeśli nie ma nic dalej, pewnie float
+        while (isspace(*s)) s++;
+        if (*s && strchr(dop,*s)) {
+            if (minus) return BADGEO;
+            if (strchr("sSwW",*s)) minus = 1;
+            s++;
+            while (isspace(*s)) s++;
+            if (*s) return BADGEO;
+        }
+        if (!*s) {
+            if (ndit == 2 && par[1] <= '5') return NUNGEO;
+            deg += 3600 * strtod(par, NULL);
+            if (minus) deg=-deg;
+            return deg;
+        }
+    }
+    if (minus) return BADGEO;
+    while (*par && !isdigit(*par)) par++;
+    int m=strtol(par,(char **)&par, 10);
+    if (m >= 60) return BADGEO;
+    deg += m * 60;
+    while (*par && !isalnum(*par)) par++;
+    if (isdigit(*par)) {
+        m=strtol(par,(char **)&par, 10);
+        if (m >= 60) return BADGEO;
+        deg += m;
+        while (*par && !isalnum(*par)) par++;
+    }
+    if (*par) {
+        if (!strchr(dop,*par)) return BADGEO;
+        if (strchr("sSwW",*par++)) minus = 1;
+        while (isspace(*par)) par++;
+        if (*par) return BADGEO;
+    }
+    if (minus) return -deg;
+    return deg;
+}
+
+#endif
         
 
 static void printgeo(Print &Ser, const char *coto, int32_t ile, const char *pmin)
@@ -563,6 +621,10 @@ uint8_t pfsLon(Print &Ser, char *par)
         Ser.printf("Błędna wartość długości\n");
         return 0;
     }
+    if (lon == NUNGEO) {
+        Ser.printf("Niejdnoznaczny zapis długości\n");
+        return 0;
+    }
     geoPrefs.lon = lon;
     geoPrefs.autoelev = ELEV_AUTO;
     printgeo(Ser,"Długość",lon,"EW");
@@ -578,6 +640,10 @@ uint8_t pfsLat(Print &Ser, char *par)
     int lat = parseGeo(Ser, par, "nNsS", 90);
     if (lat == BADGEO) {
         Ser.printf("Błędna wartość szerokości\n");
+        return 0;
+    }
+    if (lat == NUNGEO) {
+        Ser.printf("Niejdnoznaczny zapis szerokości\n");
         return 0;
     }
     geoPrefs.lat = lat;

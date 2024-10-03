@@ -88,8 +88,8 @@ static uint8_t showSrvAdr(Print &Ser, char *s)
         Ser.printf("Urządzenie niepodłączone\n");
         return 0;
     }
-    strcat(buf,":8080/");
-    Ser.printf("%s\n", buf);
+    //strcat(buf,":8080/");
+    Ser.printf("%s:%d/\n", buf,SERVER_PORT);
     return 1;
 }
 
@@ -147,7 +147,7 @@ static const struct serCommand {
     ewentualnie zakończone literą E (domyślnie wschód) lub W (zachód)", pfsLon},
     {"lat","Szerokość geograficzna","liczba ułamkowa (ujemna to szerokość południowa) albo\n\
     dwie lub trzy liczby oznaczające stopnie, minuty i sekundy,\n\
-    ewentualnie zakończone literą N (domyślnie północ lub S (południe)", pfsLat},
+    ewentualnie zakończone literą N (domyślnie północ) lub S (południe)", pfsLat},
     {"elev","Wysokość nad poziomem morza","Wysokość w metrach lub A jeśli wyliczana automatycznie",pfsElev},
     {"tz","Strefa czasowa dla prognozy pogody","p - Polska; a - automatyczna",pfsTiz},
     {"geo","Wszystkie parametry lokalizacji","z parametrem save - zapisanie\n\
