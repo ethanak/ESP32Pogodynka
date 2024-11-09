@@ -2,6 +2,7 @@
 #include <WiFi.h>
 #include <esp_now.h>
 #include <esp_wifi.h>
+#include <esp_mac.h>
 #include <Preferences.h>
 #include "Termometr.h"
 
@@ -22,7 +23,12 @@ void printMac (const char *pfx,const uint8_t *mac)
 
 
 static uint8_t RTC_DATA_ATTR last_channel;
+static uint8_t RTC_DATA_ATTR debugMode;
 
+bool debugOn()
+{
+    return debugMode == 1;
+}
 
 static uint8_t dataSentSucc;
 
@@ -31,6 +37,7 @@ void onDataSent(const uint8_t *mac, esp_now_send_status_t status)
     if (status == ESP_NOW_SEND_SUCCESS) dataSentSucc = 1;
     //Serial.printf(status == ESP_NOW_SEND_SUCCESS ? "Dane odebrane przez slave\r\n" : "Slave nie odebrał danych\r\n");
 }
+
 
 
 
@@ -69,6 +76,8 @@ uint8_t getAccu()
     if (ami >= 3400) return 3; // akumulator częściowo eozładowany
     return 4; // akumulator wymaga ładowania
 }
+static uint8_t havermac = 0;
+uint8_t realMac[6];
 void initEN()
 {
     if (last_channel <= 0 || last_channel >= 13) {
@@ -77,6 +86,17 @@ void initEN()
     WiFi.mode(WIFI_STA);
     WiFi.disconnect();
     esp_now_deinit();
+    
+    if (!havermac) {
+        esp_wifi_get_mac(WIFI_IF_STA, realMac);
+        havermac=1;
+    }
+    if (realPrefes.flags & PFS_FAKEMAC) {
+        WiFi.STA.begin();
+        esp_err_t ret = esp_wifi_set_mac(WIFI_IF_STA,realPrefes.fakemac);
+        if (ret) Serial.printf("Błąd ustawienia MAC: %s\n",esp_err_to_name(ret));
+        WiFi.STA.begin();
+    }
     esp_wifi_set_channel(last_channel,(wifi_second_chan_t)0);
     esp_now_init();
     esp_now_register_send_cb(onDataSent);
@@ -133,6 +153,28 @@ void dataSend()
     sendStatus = SES_START;
 }
 
+static void printSent()
+{
+    if (!debugOn()) return;
+    char buf[80];
+    char *c =buf;
+    c +=sprintf(c,"Wysłano: CA=%d, V=%d, H=", senten[1],
+        senten[5] | (senten[6] << 8));
+    if (senten[2] == 0xff) c+=sprintf(c,"None");
+    else c+= sprintf(c,"%d%%",senten[2]);
+    if (senten[3] == 0x7f && senten[4] == 0x7f) c+= sprintf(c,", T=None");
+    else {
+        int16_t t = senten[3] | (senten[4] << 8);
+        c+=sprintf(c,", T=%d d°C",t);
+    }
+    if (senten[7] == 0x7f && senten[8] == 0x7f) c+= sprintf(c,", P=None");
+    else {
+        uint16_t t = senten[3] | (senten[4] << 8);
+        c+=sprintf(c,", P=%d hPa",t);
+    }
+    Serial.printf("%s\n",buf);
+}
+
 void realSend()
 {
     esp_now_send(realPrefes.station,senten,9);
@@ -166,6 +208,7 @@ void sendLoop()
         case SES_SENT:
         if (millis() - sentTime < 10) break;
         if (dataSentSucc) {
+            printSent();
             sendStatus = 0;
             sentOK=1;
             break;
@@ -177,6 +220,7 @@ void sendLoop()
         }
         sentChn++;
         if (sentChn >= 13) {
+            if (debugOn()) Serial.printf("Nie mogę znaleźć kanału!\n");
         //    Serial.printf("Dupa\n");
             sendStatus = 0;
             sentOK=2;
@@ -311,6 +355,52 @@ void pfsTerm(char *s)
     
 }
 
+uint8_t macFromPar(char *s,uint8_t *adr)
+{
+    int i;uint8_t mac[6];
+    for (i=0;i<6;i++) {
+        if (i) {
+            while (*s && !isxdigit(*s)) s++;
+        }
+        if (!*s || !s[1] || !isxdigit(*s) || !isxdigit(s[1])) break;
+        if (s[2] && isxdigit(s[2])) break;
+        mac[i]=strtol(s,&s, 16);
+        if (!i && !mac[i]) break;
+    }
+    if (i < 6 || *s || (mac[0] & 1)) {
+        return 0;
+    }
+    memcpy((void *)adr, (void *)mac, 6);
+    return 1;
+}
+
+void pfsFakeMac(char *s)
+{
+
+    if (s && *s) {
+        if (!strcmp(s,"on")) prefes.flags |= PFS_FAKEMAC;
+        else if (!strcmp(s,"off")) prefes.flags &= ~PFS_FAKEMAC;
+        else {
+            const char *c=getToken(&s);
+            if (strcmp(c,"set")) {
+                Serial.printf("Nieznany parametr %s\n", c);
+                return;
+            }
+            if (!macFromPar(s, prefes.fakemac)) {
+                Serial.printf("Błędny adres MAC\n");
+                return;
+            }
+        }
+    }
+    printMac(
+               "Oryginalny MAC        ", realMac);
+    Serial.printf("Podmieniony MAC ");
+    printMac(
+        (prefes.flags & PFS_FAKEMAC) ? "(ON)  ": "(OFF) ",
+        prefes.fakemac);
+    
+}
+
 const char *const pinames[] ={
     "t","scl","sda"
 };
@@ -396,23 +486,19 @@ void pfsSave(char *s)
 
 void pfsPeer(char *s)
 {
-    int i; uint8_t mac[6];
+    int i; uint8_t mac[6],mbc[6];
     if (s && *s) {
-        for (i=0;i<6;i++) {
-            if (i) {
-                while (*s && !isxdigit(*s)) s++;
-            }
-            if (!*s || !s[1] || !isxdigit(*s) || !isxdigit(s[1])) break;
-            if (s[2] && isxdigit(s[2])) break;
-            mac[i]=strtol(s,&s, 16);
-            if (!i && !mac[i]) break;
-        }
-        if (i < 6 || *s) {
+        if (!macFromPar(s, mac)) {
             Serial.printf("Błędny adres MAC\n");
             return;
         }
-        memcpy((void *)prefes.station,(void *)mac,6);
     }
+    esp_wifi_get_mac(WIFI_IF_STA, mbc);
+    if (!memcmp((void *)mac, (void *)mbc, 6)) {
+        Serial.printf("To jest adres czujnika, podaj adres stacji\n");
+        return;
+    }
+    memcpy((void *)prefes.station,(void *)mac,6);
     printMac ("Adress stacji: ",prefes.station);  
 }
 
@@ -442,4 +528,17 @@ void pfsCharger(char *s)
     Serial.printf("Urządzenie %s do ładowania\n",
         (prefes.flags & PFS_HAVE_CHARGER)? "wykrywa podłączenie" : "nie wykrywa podłączenia");
         
+}
+
+void pfsDebug(char *s)
+{
+    if (s && *s) {
+        if (!strcmp(s,"on")) debugMode = 1;
+        else if (!strcmp(s,"off")) debugMode = 0;
+        else {
+            Serial.printf("Błędny parametr\n");
+            return;
+        }
+    }
+    Serial.printf("Stan debug: %słączony\r\n",debugMode ?"za":"wy");
 }

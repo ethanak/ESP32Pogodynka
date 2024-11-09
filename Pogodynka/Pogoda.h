@@ -1,7 +1,7 @@
 #ifndef POGODA_H
 #define POGODA_H
 
-#define firmware_version "0.2.9"
+#define firmware_version "0.2.10"
 
 #define UNIT_USE_EVENTS 1
 #define S3_ALLOW_ALL_PINS 1
@@ -117,9 +117,14 @@ extern struct netPrefs {
     uint32_t mask;
     uint32_t ns1;
     uint32_t ns2;
-    uint8_t dhcp;
+    uint8_t flags;
     char name[15];
+    uint8_t fakemac[6];
 } netPrefs;
+
+#define NETFLAG_DHCP 1
+#define NETFLAG_FAKEMAC 2
+
 extern uint8_t pfsSsid(Print &Ser, char *par);
 extern uint8_t pfsPass(Print &Ser, char *par);
 extern uint8_t pfsDhcp(Print &Ser, char *par);
@@ -129,6 +134,7 @@ extern uint8_t pfsMyMask(Print &Ser, char *par);
 extern uint8_t pfsMyNS1(Print &Ser, char *par);
 extern uint8_t pfsMyNS2(Print &Ser, char *par);
 extern uint8_t pfsNetName(Print &Ser, char *par);
+extern uint8_t pfsMyFakeMac(Print &Ser, char *par);
 extern uint8_t pfsNet(Print &Ser, char *par);
 extern uint8_t pfsTempo(Print &Ser, char *par);
 extern uint8_t pfsPitch(Print &Ser, char *par);
@@ -401,7 +407,7 @@ struct cmdBuffer {
 };
 
 extern void addCmdChar(Print &ser,struct cmdBuffer *buf, uint8_t znak, uint8_t fromTelnet = 0);
-extern void printMac(Print &ser, const char *pfx, const uint8_t *mac);
+extern void printMac(Print &ser, const char *pfx, const uint8_t *mac, const char *sfx=NULL);
 extern bool haveWeather;
 
 //pinology
@@ -445,6 +451,8 @@ extern uint8_t doOtaUpdate;
 
 extern void sayCWait(const char *c);
 extern int sayCondPercent(int pc);
+
+extern uint8_t realMac[6];
 #endif
 
 

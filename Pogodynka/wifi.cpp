@@ -2,6 +2,7 @@
 #include "Pogoda.h"
 #include <WiFi.h>
 #include <esp_wifi.h>
+#include <esp_mac.h>
 #include <ESPmDNS.h>
 
 struct netPrefs currentNet;
@@ -10,7 +11,7 @@ static void wifiConnect()
 {
     WiFi.disconnect(true);
     WiFi.begin(currentNet.ssid, currentNet.pass);
-    if (!currentNet.dhcp) {
+    if (!currentNet.flags & NETFLAG_DHCP) {
         WiFi.config(currentNet.ip, currentNet.gw, currentNet.mask,
             currentNet.ns1, currentNet.ns2);
     }
@@ -35,10 +36,12 @@ static void Wifi_disconnected(WiFiEvent_t event, WiFiEventInfo_t info) {
     wifiConnect();
     
 }
-
+uint8_t realMac[6];
 uint8_t stationMac[6];
 static void WiFi_connected(WiFiEvent_t event, WiFiEventInfo_t info) {
-    if (!stationMac[0]) esp_wifi_get_mac(WIFI_IF_STA, stationMac);
+
+    if (!stationMac[0])
+        esp_wifi_get_mac(WIFI_IF_STA, stationMac);
     Procure;
     wifiShowMsg=2;
     Vacate;
@@ -65,6 +68,8 @@ static void WiFi_gotIP(WiFiEvent_t event, WiFiEventInfo_t info) {
     }
 }
 
+
+
 void initWiFi()
 {
     WiFi.mode(WIFI_STA);
@@ -73,7 +78,15 @@ void initWiFi()
         wifiShowMsg=4;
         return;
     }
+    
     currentNet = netPrefs;
+    WiFi.STA.begin();
+    WiFiGetMac(realMac);
+    if (netPrefs.flags & NETFLAG_FAKEMAC) {
+        esp_err_t ret = esp_iface_mac_addr_set(netPrefs.fakemac,ESP_MAC_WIFI_STA);
+        if (ret) Serial.printf("Błąd ustawienia MAC: %s\n",esp_err_to_name(ret));
+        
+    }
     WiFi.onEvent(WiFi_connected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_CONNECTED);
     WiFi.onEvent(Wifi_disconnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
     WiFi.onEvent(WiFi_gotIP, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_GOT_IP);

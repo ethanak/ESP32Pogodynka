@@ -36,6 +36,11 @@ static const struct serCommand {
     void (*fun)(char *);
 } serCmds[] ={
     {"help","Pomoc","Parametr - polecenie którego dotyczy pomoc",pfsHelp},
+    {"debug","Komunikaty diagnostyczne","Bez parametru: pokazuje stan\n\
+    Z parametrem 'on' włącza komunikaty\n\
+    Z parametrem 'off' wyłącza komunikaty\n\
+    Stan debug nie jest zapisywany do flasha, działa natychmiast\n\
+    aż do wyłączenia urzączenia", pfsDebug},
     {"mymac","Pokazuje adres MAC urządzenia",NULL, showLocMac},
     {"sensor","Typ podłączonego czujnika",
         "Bez parametru pokazuje typ\n    Parametr none, ds, dht11, dht22 lub bmp ustawia typ\n",pfsTerm},
@@ -46,6 +51,12 @@ static const struct serCommand {
     {"peer","Adres głównego urządzenia",
         "Bez parametru pokazuje aktualny adres\nSześć dwucyfrowych liczb sesnastkowych (adres MAC)\n\
     Liczby mogą być oddzielane dowolnymi znakami",pfsPeer},
+    {"fakemac","Podmieniony adres MAC czujnika","Bez parametru podaje aktualny stan\n\
+    Z parametrem 'off' wyłącza podmianę adresu\n\
+    Z parametrem 'on' włącza podmianę adresu\n\
+    Z parametrem 'set' po którym następuje adres MAC ustawia fałszywy adres.\n\
+    Adres to Sześć dwucyfrowych liczb sesnastkowych oddzielonych dowolnymi znakami",
+        pfsFakeMac},
     {"sleep","Czas uśpienia między pomiarami","Bez parametru - pokazuje czas.\n\
     Liczba z zakresu 30 do 600 - czas między wybudzeniami w sekundach",pfsSleep},
     {"accalib","Kalibracja pomiaru napięcia akumulatora",

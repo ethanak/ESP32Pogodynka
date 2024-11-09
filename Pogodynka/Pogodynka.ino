@@ -625,6 +625,7 @@ void loop()
                         }
 
                     }
+                    c+= sprintf(c,". ");
                 }
             }
             if (tin & THV_EACU) {
@@ -642,15 +643,15 @@ void loop()
             }
             if (tin & THV_ACU) {
                 uint8_t aena = 0;
-                if (enoAcc[0] >= 3) {
-                    if (!akuSaid || (enoAcc[0] > 3 && glt > 1)) {
+                if (enoAcc[1] >= 3) {
+                    if (!akuSaid || (enoAcc[1] > 3 && glt > 1)) {
                         aena = 1;
                         akuSaid = 1;
                         akuSaidTime = millis();
                     }
                 }
                 if (aena) {
-                    sprintf(c, (enoAcc[0] == 3) ? "Niski poziom akumulatora %s. " : "Uwaga, akumulator %s rozładowany. ", weaPrefs.inname);
+                    sprintf(c, (enoAcc[1] == 3) ? "Niski poziom akumulatora %s. " : "Uwaga, akumulator %s rozładowany. ", weaPrefs.inname);
                 }
             }
             

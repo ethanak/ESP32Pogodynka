@@ -15,11 +15,13 @@ extern struct prefes {
     uint8_t station[6];
     uint8_t sclpin;
     uint8_t sdapin;
+    uint8_t fakemac[6];
     
 } prefes, realPrefes;
 
 #define PFS_HAVE_CHARGER 1
 #define PFS_KEEPALIVE 2
+#define PFS_FAKEMAC 4
 
 #ifndef ESP32
 #error Tylko dla ESP32
@@ -59,6 +61,7 @@ enum {
     
 };
 
+extern uint8_t realMac[6];
 
 extern float tempOut, hgrOut, presOut;
 extern void pfsSleep(char *s);
@@ -69,8 +72,10 @@ extern void pfsSave(char *s);
 extern void pfsPeer(char *s);
 extern void pfsKeep(char *s);
 extern void pfsCharger(char *s);
+extern void pfsFakeMac(char *s);
+extern void pfsDebug(char *s);
 
-
+extern bool debugOn();
 extern void initPFS();
 extern uint8_t readTemp();
 extern uint8_t sentOK;

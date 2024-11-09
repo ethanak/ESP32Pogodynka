@@ -383,7 +383,7 @@ static void handleGetAp(AsyncWebServerRequest *request)
     jsonstr(response,netPrefs.pass);
     response->printf(",\n\"mdns\":");
     jsonstr(response,netPrefs.name);
-    response->printf(",\n\"dhcp\":%d",netPrefs.dhcp);
+    response->printf(",\n\"dhcp\":%d",(netPrefs.flags & NETFLAG_DHCP));
     ptipadr(response,"ipadr",netPrefs.ip);
     ptipadr(response,"ipmask",netPrefs.mask);
     ptipadr(response,"ipgw",netPrefs.gw);
@@ -480,8 +480,10 @@ static void handleSetAp(AsyncWebServerRequest *request) {
         if (!properAvahi(arg.c_str(),pfs.name)) sef("Błędna nazwa lokalna");
     }
     else pfs.name[0] = 0;
-    pfs.dhcp=request->arg("dhcp").c_str()[0] == '1';
-    if (!pfs.dhcp) {
+    if (request->arg("dhcp").c_str()[0] == '1') pfs.flags |= NETFLAG_DHCP;
+    else pfs.flags &= ~NETFLAG_DHCP;
+    //pfs.dhcp=request->arg("dhcp").c_str()[0] == '1';
+    if (!(pfs.flags & NETFLAG_DHCP)) {
         IPAddress IA;
         IA.fromString(request->arg("ipadr"));
         if (!(pfs.ip = (uint32_t)IA)) sef("Błędny adres IP urządzenia");

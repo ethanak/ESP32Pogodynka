@@ -523,7 +523,7 @@ uint8_t rainyCount;
 static const char *const hoursodo[]={
     "północy","pierwszej","drugiej","trzeciej",
     "czwartej","piątej","szóstej","siódmej",
-    "ósmej","dziewiętej","dziesiątej","jedenastej",
+    "ósmej","dziewiątej","dziesiątej","jedenastej",
     "dwunastej","trzynastej","czternastej","piętnastej",
     "szesnastej","siedemnastej","osiemnastej","dziewiętnastej",
     "dwudziestej","dwudziestej pierwszej","dwudziestej drugiej",

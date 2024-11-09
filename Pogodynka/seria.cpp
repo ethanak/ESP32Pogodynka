@@ -125,6 +125,11 @@ static const struct serCommand {
     Podana nazwa może zawierać wyłącznie małe litery ASCII oraz cyfry,\n\
     mogą być przedzielone myślnikami. Maksymalna długość nazwy 14 znaków\n\
     Podanie samego myślnika oznacza pustą nazwę (wyłączenie mDNS)",pfsNetName},
+    {"fakemac","Podmieniony adres MAC stacji","Bez parametru podaje aktualny stan\n\
+    Z parametrem 'off' wyłącza podmianę adresu\n\
+    Z parametrem 'on' włącza podmianę adresu\n\
+    Z parametrem 'set' po którym następuje adres MAC ustawia fałszywy adres",
+        pfsMyFakeMac},
     {"net","Wszystkie ustawienia sieci","z parametrem save zapisuje i resetuje\n\
     z parametrem restore wraca do zapisanych ustawień\n\
     bez parametru pokazuje ustawienia",pfsNet},

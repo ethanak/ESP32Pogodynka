@@ -40,7 +40,9 @@ void loop()
             initEN();
             wifiset=1;
         }
-        Serial.printf("Sent after %d %d\n", seconds() - lastSent, seconds() - lastActivity);
+        if (debugOn()) {
+            Serial.printf("Próba wysłania po %d (sent) %d (actv)\n", seconds() - lastSent, seconds() - lastActivity);
+        }
         
         //Serial.printf("I=%d, JTag %d\n",i++,usb_serial_jtag_is_connected());
         sentOK = 0;

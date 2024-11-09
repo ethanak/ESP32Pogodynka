@@ -180,13 +180,20 @@ void initPrefs()
 bool canConnect()
 {
     if (!netPrefs.ssid[0] || !netPrefs.pass[0]) return false;
-    if (netPrefs.dhcp) return true;
+    if (netPrefs.flags & NETFLAG_DHCP) return true;
     if (!netPrefs.ip || !netPrefs.gw || !netPrefs.mask || !netPrefs.ns1) return false;
     return true;
 }
 
 
 
+static const char *const adrErrors[]={
+    "Błędny zapis liczby szesnastkowej",
+    "Niedopuszczalna wartość",
+    "To urządzenie nie ma ustawianego adresu",
+    "Błędny zapis adresu MAC",
+    "Błędny parametr",
+    "To jest lokalny adres MAC"};
 
 uint8_t pfsSsid(Print &Ser, char *par)
 {
@@ -237,13 +244,14 @@ static int check2(Print &Ser,const char *str, const char *sf, const char *st)
 uint8_t pfsDhcp(Print &Ser, char *par)
 {
     if (!par || !*par) {
-        Ser.printf("Konfiguracja IP: %s\n",netPrefs.dhcp ? "automatyczna":"ręczna");
+        Ser.printf("Konfiguracja IP: %s\n",(netPrefs.flags & NETFLAG_DHCP) ? "automatyczna":"ręczna");
         return 1;
     }
     int t=check2(Ser,par,"rR","aA");
     if (t < 0) return 0;
-    netPrefs.dhcp=t;
-    Ser.printf("Ustawiona konfiguracja IP: %s\n",netPrefs.dhcp ? "automatyczna":"ręczna");
+    if (t) netPrefs.flags |= NETFLAG_DHCP;
+    else netPrefs.flags &= ~NETFLAG_DHCP;
+    Ser.printf("Ustawiona konfiguracja IP: %s\n",(netPrefs.flags & NETFLAG_DHCP) ? "automatyczna":"ręczna");
     return 1;
 }
 
@@ -355,6 +363,47 @@ uint8_t pfsNetName(Print &Ser, char *par)
     return 1;
 }
 
+uint8_t getMacFromPar(const char *par, uint8_t *adr)
+{    
+    int i;
+    uint8_t mac[6];
+    for (i=0;i<6;i++) {
+        if (i) {
+            while (*par && !isxdigit(*par)) par++;
+        }
+        if (!*par || !par[1] || !isxdigit(*par) || !isxdigit(par[1])) return 4;
+        if (par[2] && isxdigit(par[2])) return 4;
+        mac[i]=strtol(par, (char **)&par, 16);
+    }
+    if (*par) return 4;
+    if (mac[0] & 1) return 2;
+    memcpy(adr,mac,6);
+    return 0;
+}
+
+uint8_t pfsMyFakeMac(Print &Ser, char *par)
+{
+    if (par && *par) {
+        if (!strcmp(par,"on")) netPrefs.flags |= NETFLAG_FAKEMAC;
+        else if (!strcmp(par,"off")) netPrefs.flags &= ~NETFLAG_FAKEMAC;
+        else {
+            const char *c=getToken(&par);
+            if (strcmp(c,"set")) {
+                Ser.printf("Nieznany parametr %s\n", c);
+                return 0;
+            }
+            int rc;
+            if (rc=getMacFromPar(par, netPrefs.fakemac)) {
+                Ser.printf("Błąd: %s\n",adrErrors[rc-1]);
+                return 0;
+            }
+        }
+    }
+    printMac(Ser,"Oryginalny MAC  ", realMac);
+    printMac(Ser,"Podmieniony MAC ", netPrefs.fakemac,
+        (netPrefs.flags & NETFLAG_FAKEMAC) ? "(aktywny)": "(nieaktywny)");
+    return 1;
+}
 
 static void printip(Print &Ser,const char *name, uint32_t ip)
 {
@@ -368,8 +417,8 @@ uint8_t pfsNet(Print &Ser, char *par)
         Ser.printf("SSID: %s\nHasło: %s\nKonfiguracja: %s\n",
             netPrefs.ssid[0] ? netPrefs.ssid: "nieustawione",
             netPrefs.pass[0] ? netPrefs.pass: "nieustawione",
-            netPrefs.dhcp ? "automatyczna":"ręczna");
-        if (!netPrefs.dhcp) {
+            (netPrefs.flags & NETFLAG_DHCP) ? "automatyczna":"ręczna");
+        if (!(netPrefs.flags & NETFLAG_DHCP)) {
             printip(Ser,"Adres IP urządzenia",netPrefs.ip);
             printip(Ser,"Adres IP bramy",netPrefs.gw);
             printip(Ser,"Maska sieci",netPrefs.mask);
@@ -378,6 +427,9 @@ uint8_t pfsNet(Print &Ser, char *par)
         }
         if (!netPrefs.name[0]) Ser.printf("mDNS wyłączony\n");
         else Ser.printf("Nazwa dla mDNS: \"%s\"\n",netPrefs.name);
+        printMac(Ser,"Fake MAC: ",netPrefs.fakemac,
+            (netPrefs.flags & NETFLAG_FAKEMAC) ? "(aktywny)": "(nieaktywny)");
+        
         return 1;
     }
     if (!strcmp(par,"save")) {
@@ -721,10 +773,10 @@ static const char * const tmprNamesD[]={
     "brak","DS18B20","DHT11","DHT22","BMP180","BMP280","esp-now","BME280",NULL};
 
 
-void printMac(Print &Ser, const char *pfx, const uint8_t *mac)
+void printMac(Print &Ser, const char *pfx, const uint8_t *mac, const char *sfx)
 {
-    Ser.printf("%s%02X:%02X:%02X:%02X:%02X:%02X\n", pfx,
-                mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+    Ser.printf("%s%02X:%02X:%02X:%02X:%02X:%02X %s\n", pfx,
+                mac[0], mac[1], mac[2], mac[3], mac[4], mac[5], sfx?sfx:"");
 }
 
 static void printTermDev(Print &Ser, uint8_t typ, uint8_t i2cadr, const uint8_t *dsadr,const uint8_t *mac=NULL,bool addrobly=false)
@@ -891,12 +943,6 @@ uint8_t pfsHard(Print &Ser, char *par)
     Ser.printf("Błędny parametr\n");
     return 0;
 }
-static const char *const adrErrors[]={
-    "Błędny zapis liczby szesnastkowej",
-    "Niedopuszczalna wartość",
-    "To urządzenie nie ma ustawianego adresu",
-    "Błędny zapis adresu MAC",
-    "Błędny parametr"};
 
 int geti2cadr(const char *c)
 {
@@ -918,26 +964,20 @@ uint8_t getDSAdr(const char *par,uint8_t *adr)
 
 static uint8_t getExtMac(const char *par, uint8_t *adr)
 {
-    int i;
-    uint8_t mac[6];
     if (!strcmp(par,"unset")) {
         memset((void *)adr, 0,6);
         return 1;
     }
-    for (i=0;i<6;i++) {
-        if (i) {
-            while (*par && !isxdigit(*par)) par++;
-        }
-        if (!*par || !par[1] || !isxdigit(*par) || !isxdigit(par[1])) return 4;
-        if (par[2] && isxdigit(par[2])) return 4;
-        mac[i]=strtol(par, (char **)&par, 16);
-    }
-    if (*par) return 4;
+    uint8_t mac[6];
+    uint8_t mbc[6];
+    int rc;
+    if (rc=getMacFromPar(par, mac)) return rc;
+    WiFiGetMac(mbc);
+    if (!memcmp(mac, mbc,6)) return 6;
     memcpy(adr,mac,6);
     return 0;
 }
-        
-    
+
 uint8_t pfsEtadr(Print &Ser, char *par)
 {
     if (!par || !*par) {
@@ -1653,5 +1693,3 @@ uint8_t pfsCalAll(Print &Ser, char *par)
     return 0;
     
 }
-
-
