@@ -169,7 +169,7 @@ static void printSent()
     }
     if (senten[7] == 0x7f && senten[8] == 0x7f) c+= sprintf(c,", P=None");
     else {
-        uint16_t t = senten[3] | (senten[4] << 8);
+        uint16_t t = senten[7] | (senten[8] << 8);
         c+=sprintf(c,", P=%d hPa",t);
     }
     Serial.printf("%s\n",buf);
