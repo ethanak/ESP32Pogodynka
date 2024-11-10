@@ -492,13 +492,15 @@ void pfsPeer(char *s)
             Serial.printf("Błędny adres MAC\n");
             return;
         }
+        printMac("GVot mac", mac);
+    
+        esp_wifi_get_mac(WIFI_IF_STA, mbc);
+        if (!memcmp((void *)mac, (void *)mbc, 6)) {
+            Serial.printf("To jest adres czujnika, podaj adres stacji\n");
+            return;
+        }
+        memcpy((void *)prefes.station,(void *)mac,6);
     }
-    esp_wifi_get_mac(WIFI_IF_STA, mbc);
-    if (!memcmp((void *)mac, (void *)mbc, 6)) {
-        Serial.printf("To jest adres czujnika, podaj adres stacji\n");
-        return;
-    }
-    memcpy((void *)prefes.station,(void *)mac,6);
     printMac ("Adress stacji: ",prefes.station);  
 }
 
