@@ -112,7 +112,9 @@ static const struct serCommand {
     uint8_t (*fun)(Print &,char *);
 } serCmds[] ={
     {"help","Pomoc","Parametr - polecenie którego dotyczy pomoc",pfsHelp},
-    {"+network","Połączenie WiFi",NULL,NULL},
+    {"+network","Połączenie WiFi","""UWAGA!!!\n\
+    Zmiany wprowadzane w tej sekcji będą aktywne dopiero po wydaniu\n\
+    polecenia 'net save'""",NULL},
     {"ssid","Nazwa sieci WiFi","Podanie parametru ustawia nazwę",pfsSsid},
     {"pass","Hasło sieci WiFi","Podanie parametru ustawia hasło",pfsPass},
     {"dhcp","Konfiguracja IP","a - automatyczna; r - ręczna",pfsDhcp},
@@ -297,6 +299,7 @@ static uint8_t pfsHelp(Print &Ser, char *s)
         for (i=hp; serCmds[i].name && serCmds[i].name[0] != '+'; i++) {
             Ser.printf("%s: %s\n",serCmds[i].name,serCmds[i].shdes);
         }
+        if (serCmds[hp-1].ldes) Ser.printf("%s\n",serCmds[hp-1].ldes);
         return 1;
     }
     if (nm >= 0) {

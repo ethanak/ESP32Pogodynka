@@ -399,9 +399,12 @@ uint8_t pfsMyFakeMac(Print &Ser, char *par)
             }
         }
     }
-    printMac(Ser,"Oryginalny MAC  ", realMac);
-    printMac(Ser,"Podmieniony MAC ", netPrefs.fakemac,
+    printMac(Ser,"Oryginalny MAC:  ", realMac);
+    printMac(Ser,"Podmieniony MAC: ", netPrefs.fakemac,
         (netPrefs.flags & NETFLAG_FAKEMAC) ? "(aktywny)": "(nieaktywny)");
+    uint8_t mbc[6];
+    WiFiGetMac(mbc);
+    printMac(Ser,"Aktualny MAC:    ",mbc);
     return 1;
 }
 
