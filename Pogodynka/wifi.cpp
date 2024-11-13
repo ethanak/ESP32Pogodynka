@@ -11,7 +11,7 @@ static void wifiConnect()
 {
     WiFi.disconnect(true);
     WiFi.begin(currentNet.ssid, currentNet.pass);
-    if (!currentNet.flags & NETFLAG_DHCP) {
+    if (!(currentNet.flags & NETFLAG_DHCP)) {
         WiFi.config(currentNet.ip, currentNet.gw, currentNet.mask,
             currentNet.ns1, currentNet.ns2);
     }

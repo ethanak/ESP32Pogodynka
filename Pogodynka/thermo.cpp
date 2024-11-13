@@ -219,11 +219,11 @@ uint8_t getTemperatures()
         case DEVT_ESPNOW:
         t=millis();
         Procure;
-        if (enoStat[1] && t - lastEno[1] <= ENO_MAXWAIT) {
-            if (enoStat[1] & THV_TEMP) tempIn = enoTemp[1];
-            if (enoStat[1] & THV_HGR) hgrIn = enoHumm[1];
-            if (enoStat[1] & THV_PRES) pressIn = enoPres[1];
-            rc |= enoStat[1];
+        if (enoStat[THID_INTERNAL] && t - lastEno[THID_INTERNAL] <= ENO_MAXWAIT) {
+            if (enoStat[THID_INTERNAL] & THV_TEMP) tempIn = enoTemp[THID_INTERNAL];
+            if (enoStat[THID_INTERNAL] & THV_HGR) hgrIn = enoHumm[THID_INTERNAL];
+            if (enoStat[THID_INTERNAL] & THV_PRES) pressIn = enoPres[THID_INTERNAL];
+            rc |= enoStat[THID_INTERNAL];
         }
         Vacate;
         break;
@@ -255,11 +255,11 @@ uint8_t getTemperatures()
         case DEVT_ESPNOW:
         t=millis();
         Procure;
-        if (enoStat[0] && t - lastEno[1] <= ENO_MAXWAIT) {
-            if (enoStat[0] & THV_TEMP) tempOut = enoTemp[0];
-            if (enoStat[0] & THV_HGR) hgrOut = enoHumm[0];
-            if (enoStat[0] & THV_PRES) pressOut = enoPres[0];
-            rc |= enoStat[0] << 4;
+        if (enoStat[THID_EXT] && t - lastEno[THID_EXT] <= ENO_MAXWAIT) {
+            if (enoStat[THID_EXT] & THV_TEMP) tempOut = enoTemp[THID_EXT];
+            if (enoStat[THID_EXT] & THV_HGR) hgrOut = enoHumm[THID_EXT];
+            if (enoStat[THID_EXT] & THV_PRES) pressOut = enoPres[THID_EXT];
+            rc |= enoStat[THID_EXT] << 4;
         }
         Vacate;
         break;

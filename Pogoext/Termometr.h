@@ -22,6 +22,7 @@ extern struct prefes {
 #define PFS_HAVE_CHARGER 1
 #define PFS_KEEPALIVE 2
 #define PFS_FAKEMAC 4
+#define PFS_CHECK_USB_CHARGER 8
 
 #ifndef ESP32
 #error Tylko dla ESP32

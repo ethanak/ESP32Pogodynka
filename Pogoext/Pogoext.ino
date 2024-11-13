@@ -18,7 +18,7 @@ uint32_t lastActivity,lastSent,waitSeconds;
 unsigned long ARDUINO_ISR_ATTR seconds() {
   return (unsigned long)(esp_timer_get_time() / 1000000ULL);
 }
-uint8_t slp;
+uint8_t sleepy;
 void setup()
 {
     Serial.begin(115200);
@@ -28,7 +28,17 @@ void setup()
     ms=millis()+2000UL-(uint32_t)realPrefes.sleep;
     wifiset=0;
     waitSeconds = 3;
-    slp = (esp_reset_reason() == ESP_RST_DEEPSLEEP);
+    sleepy = (esp_reset_reason() == ESP_RST_DEEPSLEEP);
+}
+
+void gotoSleep()
+{
+    if (debugOn()) {
+        Serial.printf("Going to sleep\n");
+        delay(200);
+    }
+    esp_sleep_enable_timer_wakeup((uint64_t)realPrefes.sleep * 1000000ULL);
+    esp_deep_sleep_start();
 }
 
 void loop()
@@ -48,21 +58,23 @@ void loop()
         sentOK = 0;
         dataSend();
         lastSent=seconds();
-        if (waitSeconds < 5) waitSeconds = 5;
+        if (sleepy) waitSeconds = realPrefes.sleep;
     }
     
     sendLoop();
     if (sentOK) {
-        sentOK=0;
-        //if (!usb_serial_jtag_is_connected() && !(realPrefes.flags & PFS_KEEPALIVE)) {
-        if (waitSeconds > 5 && !chargeMode && !(realPrefes.flags & PFS_KEEPALIVE)) {
-            waitSeconds = 3;
-            esp_sleep_enable_timer_wakeup((uint64_t)realPrefes.sleep * 1000000ULL);
-            esp_deep_sleep_start();
+        if (!sleepy && seconds() - lastActivity < 30) waitSeconds = 5;
+        else waitSeconds = realPrefes.sleep;
+        if (debugOn()) {
+                Serial.printf("SentOK %d waitSeconds %d chargeMode %d keepAlive %d\n", sentOK, waitSeconds, chargeMode,(realPrefes.flags & PFS_KEEPALIVE));
         }
-        else {
-            if (seconds() - lastActivity < 30) waitSeconds = 5;
-            else waitSeconds = realPrefes.sleep;
+        sentOK=0;
+        if (!chargeMode && // nigdy nie śpimy w chargeMode
+            !(realPrefes.flags & PFS_KEEPALIVE) && // tu nam zabraniają
+            waitSeconds > 5) { // kontynuacja działania
+                waitSeconds = 3; // na później
+                gotoSleep();
+            
         }
     }
     serLoop();

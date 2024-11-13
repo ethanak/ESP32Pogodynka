@@ -48,14 +48,13 @@ uint16_t getPower()
 {
     int i;
     uint32_t pwr;
-    if (prefes.flags & PFS_HAVE_CHARGER) {
-        for (i=0,pwr=0; i<16; i++) pwr += analogReadMilliVolts(A1);
-        return pwr/16;
-    }
+    if (!(prefes.flags & PFS_HAVE_CHARGER)) return 0;
 #ifdef USE_USB_TEST
-    return usb_serial_jtag_is_connected()?1500:0;
+    if (prefes.flags & PFS_CHECK_USB_CHARGER) 
+        return usb_serial_jtag_is_connected()?1500:0;
 #endif
-    return 0;
+    for (i=0,pwr=0; i<16; i++) pwr += analogReadMilliVolts(A1);
+    return pwr/16;
 }
 
 uint8_t getAccu()
@@ -69,7 +68,7 @@ uint8_t getAccu()
         ami = ((ami * 4200) / prefes.v42);
         realVolt = ami;
     }
-    if (chargeMode) return 1;
+    if (chargeMode) return (prefes.flags & PFS_HAVE_CHARGER) ? 1 : 2;
     if (!prefes.v42) return 0;
     
     if (ami >= 3600) return 2; // akumulator naładowany
@@ -520,16 +519,28 @@ void pfsKeep(char *s)
 void pfsCharger(char *s)
 {
     if (s && *s) {
-        if (tolower(*s) == 't') prefes.flags |= PFS_HAVE_CHARGER;
-        else if (tolower(*s) == 'n') prefes.flags &= ~PFS_HAVE_CHARGER;
+        if (tolower(*s) == 't')
+            prefes.flags = (prefes.flags | PFS_HAVE_CHARGER) & ~PFS_CHECK_USB_CHARGER;
+        else if (tolower(*s) == 'n')
+            prefes.flags &= ~(PFS_HAVE_CHARGER | PFS_CHECK_USB_CHARGER);
+        else if (tolower(*s) == 'u')
+            prefes.flags |= (PFS_HAVE_CHARGER | PFS_CHECK_USB_CHARGER);
         else {
             Serial.printf("Błędny parametr\n");
             return;
         }
     }
-    Serial.printf("Urządzenie %s do ładowania\n",
-        (prefes.flags & PFS_HAVE_CHARGER)? "wykrywa podłączenie" : "nie wykrywa podłączenia");
-        
+#define PFSX_CHARGER_MODE (prefes.flags & (PFS_HAVE_CHARGER | PFS_CHECK_USB_CHARGER))
+    const char *c;
+    if (PFSX_CHARGER_MODE == PFS_HAVE_CHARGER)
+        c="wykrywa napięcie na pinie zasilania";
+#ifdef USE_USB_TEST
+    else if (PFSX_CHARGER_MODE == (PFS_CHECK_USB_CHARGER | PFS_HAVE_CHARGER))
+        c="wykrywa podłączenie do hosta USB";
+#endif
+    else c="nie wykrywa podłączenia ładowarki";
+    Serial.printf("Urządzenie %s\n",c);
+#undef PFSX_CHARGER_MODE
 }
 
 void pfsDebug(char *s)

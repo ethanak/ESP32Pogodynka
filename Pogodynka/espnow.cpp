@@ -41,11 +41,13 @@ void onDataReceive(const esp_now_recv_info_t *info, const uint8_t *data, int len
     printMac(Serial,"PFI ",thrPrefs.inmac);
     printMac(Serial,"DST ",info->des_addr);
     printMac(Serial,"STA ",stationMac);
+    printMac(Serial,"RLM ",realMac);
 */    
     int which;
+    
     if (memcmp((void *)(info->des_addr),stationMac,6)) return;
-    if (thrPrefs.trmex == DEVT_ESPNOW && !memcmp((void *)(info->src_addr),thrPrefs.exmac,6)) which=0;
-    else if (thrPrefs.trmin == DEVT_ESPNOW  && !memcmp((void *)(info->src_addr),thrPrefs.inmac,6)) which=1;
+    if (thrPrefs.trmex == DEVT_ESPNOW && !memcmp((void *)(info->src_addr),thrPrefs.exmac,6)) which=THID_EXT;
+    else if (thrPrefs.trmin == DEVT_ESPNOW  && !memcmp((void *)(info->src_addr),thrPrefs.inmac,6)) which=THID_INTERNAL;
     else {
         return;
     }
@@ -57,7 +59,8 @@ void onDataReceive(const esp_now_recv_info_t *info, const uint8_t *data, int len
     int16_t temp = ce.templ | (ce.temph <<8);
     int16_t volt = ce.voltl | (ce.volth <<8);
     int16_t pres = ce.presl | (ce.presh <<8);
-    if (debugMode) Serial.printf("ENOW(%d) %02x %d %d %d %d\n",which,ce.magic, ce.acc, ce.humm, temp,volt);
+    if (debugMode) Serial.printf("%02d:%02d:%02d ENOW(%d) %02x %d %d %d %d\n",
+        _hour, _minute, _second,which,ce.magic, ce.acc, ce.humm, temp,volt);
     uint32_t t=millis();
     Procure;
     lastEno[which] = t;

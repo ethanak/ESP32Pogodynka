@@ -1,7 +1,7 @@
 #ifndef POGODA_H
 #define POGODA_H
 
-#define firmware_version "0.2.10"
+#define firmware_version "0.2.11"
 
 #define UNIT_USE_EVENTS 1
 #define S3_ALLOW_ALL_PINS 1
@@ -338,7 +338,10 @@ enum {
     DEVT_BME280,
     //DEVT_AHT20,
     DEVT_MAX};
-    
+
+
+#define THID_EXT 0
+#define THID_INTERNAL 1
 extern uint8_t getDHT();
 //extern uint8_t getBMP280();
 extern uint8_t getBME280();

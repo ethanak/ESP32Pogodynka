@@ -44,7 +44,7 @@ static const struct serCommand {
     {"mymac","Pokazuje adres MAC urządzenia",NULL, showLocMac},
     {"sensor","Typ podłączonego czujnika",
         "Bez parametru pokazuje typ\n    Parametr none, ds, dht11, dht22 lub bmp ustawia typ\n",pfsTerm},
-    {"pin","Ustawienie pinów termomentu i i2c",
+    {"pin","Ustawienie pinów termometru i i2c",
         "Bez parametru pokazuje aktualne piny.\n\
     Z parametrem t, scl lub sda pokazuje ustawiony pin termometru lub linii i2c\n\
     Jeśli drugim parametrem będzie liczba, ustawia odpowiedni pin",pfsPin},
@@ -55,7 +55,7 @@ static const struct serCommand {
     Z parametrem 'off' wyłącza podmianę adresu\n\
     Z parametrem 'on' włącza podmianę adresu\n\
     Z parametrem 'set' po którym następuje adres MAC ustawia fałszywy adres.\n\
-    Adres to Sześć dwucyfrowych liczb sesnastkowych oddzielonych dowolnymi znakami",
+    Adres to Sześć dwucyfrowych liczb szesnastkowych oddzielonych dowolnymi znakami",
         pfsFakeMac},
     {"sleep","Czas uśpienia między pomiarami","Bez parametru - pokazuje czas.\n\
     Liczba z zakresu 30 do 600 - czas między wybudzeniami w sekundach",pfsSleep},
@@ -64,8 +64,12 @@ static const struct serCommand {
     \"start\" rozpoczęcie kalibracji. Drugim parametrem może być\n\
         aktualna zmierzona wartość napięcia (domyślnie 4200mV).\n\
     \"off\" - wyłączenie odczytu akumulatora",pfsCalib},
-    {"charger","Czy urządzenie wykrywa podłączenie do ładowania","t - tak, n - nie\n\
-    Bez parametru podahe stan",pfsCharger},
+    {"charger","Czy urządzenie wykrywa podłączenie do ładowania",
+        "n - nie\n    t - tak (wykrywanie napięcia na pinie +5V)"
+#ifdef USE_USB_TEST
+"\n    u - tak (wykrywanie podłączenia do hosta USB)"
+#endif
+"\n    Bez parametru podaje stan",pfsCharger},
     {"keep","Urządzenie nie przechodzi w tryb uśpienia",
             "Bez parametru pokazuje aktualny stan\n\
     Parametr n: jest usypiane, t: działa non stop",pfsKeep},

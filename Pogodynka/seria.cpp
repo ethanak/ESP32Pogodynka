@@ -105,6 +105,12 @@ static uint8_t rstEsp(Print &Ser, char *s)
     return 0;
 }
 
+static uint8_t pfsShowDate(Print &Ser, char *s)
+{
+    Ser.printf("%02d.%02d.%04d %02d:%02d:%02d\n",
+        _day, _month, _year, _hour, _minute, _second);
+    return 1;
+}
 static const struct serCommand {
     const char *name;
     const char *shdes;
@@ -218,6 +224,7 @@ static const struct serCommand {
     {"clk","Wszystkie ustawienia czasu","z parametrem save - zapisanie\n\
     z parametrem restore - przywrócenie zapisanych\n\
     bez parametru - pokazanie bieżących",pfsClkClk},
+    {"date","Pokazuje bieżącą datę i czas",NULL,pfsShowDate},
     {"+hardware","Ustawienia sprzętowe",NULL,NULL},
     {"iterm","Typ termometru wewnętrznego","Dopuszczalne: bmp180, bmp280, bme280, ds, esp, none",pfsIterm},
     {"eterm","Typ termometru zewnętrznego","Dopuszczalne: dht11, dht22, ds, esp, none",pfsEterm},
