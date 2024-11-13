@@ -107,6 +107,7 @@ static uint8_t rstEsp(Print &Ser, char *s)
 
 static uint8_t pfsShowDate(Print &Ser, char *s)
 {
+    getLocalTime();
     Ser.printf("%02d.%02d.%04d %02d:%02d:%02d\n",
         _day, _month, _year, _hour, _minute, _second);
     return 1;

@@ -59,8 +59,11 @@ void onDataReceive(const esp_now_recv_info_t *info, const uint8_t *data, int len
     int16_t temp = ce.templ | (ce.temph <<8);
     int16_t volt = ce.voltl | (ce.volth <<8);
     int16_t pres = ce.presl | (ce.presh <<8);
-    if (debugMode) Serial.printf("%02d:%02d:%02d ENOW(%d) %02x %d %d %d %d\n",
+    if (debugMode) {
+        getLocalTime();
+        Serial.printf("%02d:%02d:%02d ENOW(%d) %02x %d %d %d %d\n",
         _hour, _minute, _second,which,ce.magic, ce.acc, ce.humm, temp,volt);
+    }
     uint32_t t=millis();
     Procure;
     lastEno[which] = t;
