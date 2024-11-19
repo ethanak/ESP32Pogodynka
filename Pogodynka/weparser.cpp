@@ -15,8 +15,8 @@ struct curweather {
     uint8_t windir;
     uint8_t weaCode;
     uint8_t cloud;
-    uint16_t realtemp;
-    uint16_t appatemp;
+    int16_t realtemp;
+    int16_t appatemp;
     uint16_t presmsl;
     uint32_t curtime;
 } curweather;

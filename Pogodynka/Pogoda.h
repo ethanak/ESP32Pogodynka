@@ -1,7 +1,7 @@
 #ifndef POGODA_H
 #define POGODA_H
 
-#define firmware_version "0.2.11"
+#define firmware_version "0.2.12"
 
 #define UNIT_USE_EVENTS 1
 #define S3_ALLOW_ALL_PINS 1
