@@ -24,6 +24,7 @@ void printMac (const char *pfx,const uint8_t *mac)
 
 static uint8_t RTC_DATA_ATTR last_channel;
 static uint8_t RTC_DATA_ATTR debugMode;
+static uint8_t RTC_DATA_ATTR channelFound;
 
 bool debugOn()
 {
@@ -210,11 +211,18 @@ void sendLoop()
             printSent();
             sendStatus = 0;
             sentOK=1;
+            channelFound = 1;
             break;
         }
         if (sentCtl < 3) {
             if (millis() - sentTime < 50) break;
             trySend();
+            break;
+        }
+        if ((prefes.flags & PFS_KEEP_WIFI_CHANNEL) && channelFound) {
+            if (debugOn()) Serial.printf("Stacja główna nie odebrała pakietu\n");
+            sendStatus = 0;
+            sentOK = 2;
             break;
         }
         sentChn++;
@@ -554,4 +562,21 @@ void pfsDebug(char *s)
         }
     }
     Serial.printf("Stan debug: %słączony\r\n",debugMode ?"za":"wy");
+}
+
+void pfsKeepChan(char *s)
+{
+    if (s && *s) {
+        if (tolower(*s) == 't')
+            prefes.flags |= PFS_KEEP_WIFI_CHANNEL;
+        else if (tolower(*s) == 'n')
+            prefes.flags &= ~PFS_KEEP_WIFI_CHANNEL;
+        else {
+            Serial.printf("Błędny parametr\n");
+            return;
+        }
+    }
+    Serial.printf("Stacja %s\n",
+        (prefes.flags & PFS_KEEP_WIFI_CHANNEL) ? "zapamiętuje kanał WiFi" : "nie zapamiętuje kanału WiFi");
+        
 }

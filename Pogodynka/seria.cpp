@@ -238,7 +238,7 @@ static const struct serCommand {
     {"espvalid","Okres ważności danych ze zdalnego czujnika",
     "Bez poarametru podaje okres.\n\
     Parametr to liczba minut od 5 do 25 (domyślnie 15)",pfsEspvalid},
-    {"rtc","Użycie sprzętowego zegara","t: tak, n:nie",pfsClksrc},
+    {"rtc","Użycie sprzętowego zegara","t: tak, n: nie",pfsClksrc},
     {"hard","Ustawienia sprzętowe","z parametrem save - zapisanie"
 #ifdef  CONFIG_IDF_TARGET_ESP32S3
     " (oprócz pinów)"

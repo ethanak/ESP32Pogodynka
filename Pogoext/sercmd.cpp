@@ -51,6 +51,13 @@ static const struct serCommand {
     {"peer","Adres głównego urządzenia",
         "Bez parametru pokazuje aktualny adres\nSześć dwucyfrowych liczb sesnastkowych (adres MAC)\n\
     Liczby mogą być oddzielane dowolnymi znakami",pfsPeer},
+    {"chan","Czujnik zapamiętuje kanał WiFI stacji",
+        "Bez parametru: pokazuje aktualny stan\n\
+    Z parametrem 't' włącza zapamiętywanie kanału\n\
+    Z parametrem 'n' wyłącza zapamiętywanie kanału\n\
+    UWAGA! Wyłączenie zapamiętywania powoduje zwiększone zużycie akumulatora\n\
+    jeśli stacja jest wyłączona, ale jest konieczne jeśli stacja może się\n\
+    logować do różnych sieci WiFi", pfsKeepChan},
     {"fakemac","Podmieniony adres MAC czujnika","Bez parametru podaje aktualny stan\n\
     Z parametrem 'off' wyłącza podmianę adresu\n\
     Z parametrem 'on' włącza podmianę adresu\n\

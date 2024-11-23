@@ -23,6 +23,7 @@ extern struct prefes {
 #define PFS_KEEPALIVE 2
 #define PFS_FAKEMAC 4
 #define PFS_CHECK_USB_CHARGER 8
+#define PFS_KEEP_WIFI_CHANNEL 0x10
 
 #ifndef ESP32
 #error Tylko dla ESP32
@@ -75,6 +76,7 @@ extern void pfsKeep(char *s);
 extern void pfsCharger(char *s);
 extern void pfsFakeMac(char *s);
 extern void pfsDebug(char *s);
+extern void pfsKeepChan(char *s);
 
 extern bool debugOn();
 extern void initPFS();
