@@ -1,7 +1,7 @@
 #ifndef POGODA_H
 #define POGODA_H
 
-#define firmware_version "0.2.13"
+#define firmware_version "0.2.14"
 
 #define UNIT_USE_EVENTS 1
 #define S3_ALLOW_ALL_PINS 1
@@ -49,7 +49,7 @@ extern uint8_t properDate(uint8_t day, uint8_t month);
 
 extern uint8_t parseWeather(const char *str);
 extern const char * makeWeather();
-extern char weabuf[];
+extern char *weabuf;
 extern bool getWeather();
 extern bool startWeather();
 

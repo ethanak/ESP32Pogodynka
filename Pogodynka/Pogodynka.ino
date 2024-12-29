@@ -245,6 +245,13 @@ void setup()
     delay(1500);
     //scannet();
 #endif
+    if (!weabuf) weabuf=(char *)
+#ifdef BOARD_HAS_PSRAM
+    ps_malloc
+#else
+    malloc
+#endif
+    (2048);
     prefSemaphore = xSemaphoreCreateBinary();
     UnlockPrefs();
     initPrefs();

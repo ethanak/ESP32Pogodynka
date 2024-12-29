@@ -6,7 +6,7 @@
 #include <stddef.h>
 #include "Pogoda.h"
 
-
+//124128
 
 struct curweather {
     uint8_t control;
@@ -75,7 +75,7 @@ struct hrlyweather {
 #define TYP_DATETIME 6
 
 
-struct wepars {
+const struct wepars {
     const char *name;
     uint8_t cbit;
     uint8_t ofset;
@@ -93,7 +93,7 @@ struct wepars {
     {"relative_humidity_2m",CH_HUM,OC(humidity),TYP_UINT,0},
     {NULL,0,0,0}};
 
-struct wepars dlypars[]={
+const struct wepars dlypars[]={
     {"wind_speed_10m_min",DH_WIMIN,OD(windmin),TYP_WINDC,0},
     {"wind_speed_10m_max",DH_WIMAX,OD(windmax),TYP_WINDC,0},
     {"wind_gusts_10m_max",DH_WIGUS,OD(windmax),TYP_WINDC,0},
@@ -111,7 +111,7 @@ struct wepars dlypars[]={
 #define HA_SNOW 16
 #define HA_PREPRO 32
 
-struct wepars hrlpars[]={
+const struct wepars hrlpars[]={
     {"temperature_2m",HA_REALTEMP,OH(realtemp),TYP_I10,1},
     {"apparent_temperature",HA_APPATEMP,OH(appatemp),TYP_I10,1},
     {"rain",HA_RAIN,OH(rain),TYP_UINT,1},
@@ -386,7 +386,7 @@ uint8_t parseWeather(const char *str)
     return parseHourly(section);
 }
 
-char weabuf[2048];
+char *weabuf=NULL;
 
 struct weatherTrip {
     int idx;

@@ -191,7 +191,7 @@ static int wielkanoc(int year)
 #define HOLLY_FREE 1
 #define HOLLY_MOV 2
 #define HOLLY_CHURCH 4
-struct hollyDay {
+const struct hollyDay {
     uint8_t day;
     uint8_t mon;
     int8_t coffset;
@@ -207,7 +207,7 @@ struct hollyDay {
 {15,8,0,HOLLY_FREE,"Dzień Wojska Polskiego"},
 {1,11,0,HOLLY_FREE, "Wszystkich Świętych"},
 {11,11,0,HOLLY_FREE,"Święto Niepodległości"},
-{24,12,0,0,"Wigilia Bożego Narodzenia"},
+{24,12,0,HOLLY_FREE,"Wigilia Bożego Narodzenia"},
 {25,12,0,HOLLY_FREE,"Boże Narodzenie"},
 {26,12,0,HOLLY_FREE,"Drugi dzień Bożego Narodzenia"},
 {0,0,-52,HOLLY_MOV,"Tłusty Czwartek"},
